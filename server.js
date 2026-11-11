@@ -118,9 +118,11 @@ wss.on('connection', ws => {
       if (room) return;
       const r = rooms.get(String(m.code || '').toUpperCase().trim());
       if (!r) return err('Yeh room nahi mila. Code dobara check karein.');
-      const old = r.players.find(p => p.token === m.token);
-      if (old) { if (old.ws && old.ws !== ws) { try { old.ws.close(); } catch (e) {} } old.ws = ws; old.on = true; room = r; me = old; return step(room); }
-      if (r.S) return err('Is room mein game chal rahi hai. Round khatam hone par host lobby mein aaye to join karein.');
+      const nm = cleanName(m.name).toLowerCase();
+      const old = r.players.find(p => !p.bot && (p.token === m.token || (r.S && !p.on && p.name.toLowerCase() === nm)));
+      if (old) {
+        if (!r.players.some(p => p.host && p.on && p !== old)) { r.players.forEach(p => p.host = false); old.host = true; } if (old.ws && old.ws !== ws) { try { old.ws.close(); } catch (e) {} } old.ws = ws; old.on = true; room = r; me = old; return step(room); }
+      if (r.S) return err('Is room mein game chal rahi hai. Wapas aana ho to wohi naam likhein jo pehle tha (aur wo abhi online na ho).');
       if (r.players.length >= r.n) return err('Room bhar gaya hai.');
       let name = cleanName(m.name); while (r.players.some(p => p.name === name)) name = name.slice(0, 10) + (2 + crypto.randomInt(8));
       room = r; me = { token: crypto.randomBytes(12).toString('hex'), name, ws, on: true, host: false, team: null };

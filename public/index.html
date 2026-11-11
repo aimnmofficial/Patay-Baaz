@@ -805,7 +805,7 @@ function connect(first) {
     if (wantRoom && retry < 20) { retry++; toast('Rabta toot gaya, dobara jor raha hun…'); setTimeout(() => connect(() => wsSend({ t: 'join', code: wantRoom, token: LS.get('pb_tok'), name: LS.get('pb_name') })), 1200); }
   };
 }
-function leaveRoom() { wantRoom = null; LS.set('pb_room', null); wsSend({ t: 'leave' }); const s = ws; ws = null; if (s) try { s.close(); } catch (e) {} room = null; clearTimeout(pendT); clearTimeout(overT); home(); }
+function leaveRoom() { if (room) LS.set('pb_last', room.code); wantRoom = null; LS.set('pb_room', null); wsSend({ t: 'leave' }); const s = ws; ws = null; if (s) try { s.close(); } catch (e) {} room = null; clearTimeout(pendT); clearTimeout(overT); home(); }
 function onMsg(m) {
   if (m.t == 'err') { toast(m.m); if (!room) { wantRoom = null; LS.set('pb_room', null); } return; }
   if (m.t == 'room') {
@@ -828,7 +828,7 @@ function onMsg(m) {
   }
 }
 function onlineSheet() {
-  const nm = esc(LS.get('pb_name') || ''), pre = (new URLSearchParams(location.search).get('room') || '').toUpperCase();
+  const nm = esc(LS.get('pb_name') || ''), pre = (new URLSearchParams(location.search).get('room') || LS.get('pb_last') || '').toUpperCase();
   modal(`<h2 style="color:#ffd866">Doston ke saath</h2><p class="sub">Har dost apne phone se. Khaali seat par bot.</p>
     <div class="lab">Aap ka naam</div><input id="nm" maxlength="12" placeholder="Naam" value="${nm}">
     <button class="big" id="mk">Naya room banao</button>
