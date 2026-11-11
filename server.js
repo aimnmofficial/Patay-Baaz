@@ -5,6 +5,7 @@ require('./engine.js');
 const { Games } = globalThis.PB;
 
 const PORT = process.env.PORT || 3000;
+const TURN_MS = +process.env.TURN_MS || 30000;
 const BOTS = ['Chacha', 'Bubbly', 'Pappu', 'Guddu', 'Sheeda'];
 const PLAYERS = { rung: [3, 4], band: [4], president: [3, 4, 5, 6], thulla: [3, 4, 5, 6], bluff: [3, 4, 5, 6], daketi: [2, 3, 4] };
 const rooms = new Map();
@@ -23,8 +24,8 @@ const newCode = () => { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ'; let c; do c = Array
 const cleanName = n => String(n || '').replace(/[<>&"']/g, '').trim().slice(0, 12) || 'Khiladi';
 const send = (ws, m) => { if (ws && ws.readyState === 1) ws.send(JSON.stringify(m)); };
 
-function view(S, me) {
-  const v = Object.assign({}, S);
+function view(S, me, tl) {
+  const v = Object.assign({}, S); v.tl = tl == null ? null : tl;
   v.hands = S.hands.map((h, p) => p === me ? h : { length: h.length });
   if (S.deck) v.deck = { length: S.deck.length };
   delete v.rest;
@@ -43,15 +44,20 @@ function broadcast(room) {
   room.touched = Date.now();
   room.players.forEach((pl, i) => {
     send(pl.ws, roomMsg(room, pl));
-    if (room.S) send(pl.ws, { t: 'state', me: i, s: view(room.S, i) });
+    if (room.S) send(pl.ws, { t: 'state', me: i, s: view(room.S, i, room.tl) });
   });
 }
 function step(room) {
-  clearTimeout(room.timer); broadcast(room);
-  const s = room.S; if (!s || s.over) return;
+  clearTimeout(room.timer);
+  const s = room.S; room.tl = null;
+  let waitHuman = null;
+  if (s && !s.over && !s.pend) { const pl = room.players[s.turn]; if (pl && pl.on) { waitHuman = s.turn; room.tl = TURN_MS; } }
+  broadcast(room);
+  if (!s || s.over) return;
   if (s.pend) { room.timer = setTimeout(() => safe(room, () => room.G.resolve(s)), s.pend.ms); return; }
   const p = s.turn, pl = room.players[p];
-  if (!pl || !pl.on) room.timer = setTimeout(() => safe(room, () => room.G.act(s, p, room.G.bot(s, p))), pl ? 6000 : 750 + Math.random() * 500);
+  if (waitHuman != null) { room.timer = setTimeout(() => safe(room, () => { if (room.S === s && !s.over && !s.pend && s.turn === p) { room.G.act(s, p, room.G.bot(s, p)); } }), TURN_MS); return; }
+  room.timer = setTimeout(() => safe(room, () => room.G.act(s, p, room.G.bot(s, p))), !pl || !pl.on ? (pl ? 6000 : 750 + Math.random() * 500) : 750);
 }
 function safe(room, fn) { try { fn(); } catch (e) { console.error('game error', room.code, e); } step(room); }
 function startGame(room, prev) {

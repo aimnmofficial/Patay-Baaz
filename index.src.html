@@ -114,6 +114,12 @@ b.dk{display:block;white-space:nowrap;font-size:11.5px}
 .mini{display:inline-block;position:relative;background:#fff;color:#111;border-radius:5px;font:700 15px/1 Georgia,serif;padding:7px 5px 6px;margin:2px 6px 2px 0;vertical-align:middle;box-shadow:0 0 0 2px #ffd866,0 2px 5px #0008}
 .mini.red{color:#d2203a}
 .mini s{position:absolute;right:-9px;top:-8px;background:#ffd866;color:#2c1c00;border-radius:9px;font:700 10px system-ui;padding:1px 4px;text-decoration:none}
+#tbar{position:relative;height:20px;margin:2px 14px 0;border-radius:99px;background:#0007;overflow:hidden;border:1px solid #ffffff22}
+#tbar i{position:absolute;left:0;top:0;bottom:0;background:#3bb273;transition:width .25s linear}
+#tbar.mine i{background:#ffd866}
+#tbar.low i{background:#ff5a5a}
+#tbar.low.mine{animation:pulse2 .5s infinite}
+#tbar span{position:relative;display:block;text-align:center;font:700 12.5px/20px 'Baloo 2',sans-serif;color:#fff;text-shadow:0 1px 2px #000}
 /* online */
 .onl{margin:0 0 2px;background:linear-gradient(#7ee0a1,#2fae62);box-shadow:0 5px 0 #17703a;color:#04260f}
 .onl:active{box-shadow:0 2px 0 #17703a}
@@ -174,6 +180,7 @@ input:focus{border-color:#ffd866}
     <header><button id="back">←</button><div class="hd"><div id="gname"></div><div id="status"></div></div><button id="help">?</button><button id="snd"></button></header>
     <div id="table"><div id="felt"></div><div id="center"></div><div id="seats"></div><div id="badge" hidden></div><div id="hno" hidden></div><div id="flash"></div><div id="msg"></div></div>
     <div id="hint"></div>
+    <div id="tbar" hidden><i></i><span></span></div>
     <div id="meinf"></div>
     <div id="hand"></div>
     <div id="strip"></div>
@@ -185,6 +192,7 @@ input:focus{border-color:#ffd866}
   <div id="toast"></div>
 </div>
 <script>/*ENGINE*/</script>
+<script>/*SFX*/</script>
 <script>/*APP*/</script>
 </body>
 </html>
