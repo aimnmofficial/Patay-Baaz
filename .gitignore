@@ -3,3 +3,4 @@ shots/
 dist/
 srv.log
 __pycache__/
+data/

@@ -14,7 +14,7 @@ const INFO = {
   bluff: { name: 'Bluff', tag: 'Jhoot bolo, pakre mat jao', icon: '♠', col: '#ba68c8', players: [3, 4, 5, 6], def: 4,
     rules: ['Patte ulte phenko aur rank bolo, jaise "2 × A". Sach ya jhoot, aap ki marzi.', 'Agle usi rank par 1 se 4 patte aur phenkte hain, ya pass.', 'Koi bhi CHECK bol sakta hai. Jhoot nikla to phenkne wala pile uthata hai, sach nikla to check wala.', 'Jo sacha sabit ho us ki agli baari. Sab pass kar dein to pile saaf.', 'Jis ke patte pehle khatam wo jeeta.'] },
   daketi: { name: 'Daketi', tag: 'Match karo, chura lo', icon: '♦', col: '#ffb74d', players: [2, 3, 4], def: 4,
-    rules: ['Shuru mein market mein 4 khule patte hote hain, pehla player bhi unse match kar sakta hai.', 'Har baari 1 patta deck se. Haath ka patta same rank se match karo: market, opponents ya apni collection.', 'Match par us rank ke saare khule patte (market + sab opponents) aap ke. Phir ek aur patta uthao.', 'Match na ho to ek patta market mein phenko.', '4 same rank = LOCK, koi nahi chura sakta.', '2-10: 5 pts, J Q K: 10, A: 20. Deck khatam par sab ki ek aakhri baari.'] }
+    rules: ['Shuru mein market mein 4 khule patte hote hain, pehla player bhi unse match kar sakta hai.', 'Har baari 1 patta deck se. Haath ka patta same rank se match karo: market, opponents ya apni collection.', 'Match par us rank ke saare khule patte (market + sab opponents) aap ke. Phir ek aur patta uthao.', 'Match ho tab bhi zaroori nahi ke utha lo: koi bhi patta market mein phenk kar bacha sakte ho. Match na ho to phenkna hi hai.', '4 same rank = LOCK, koi nahi chura sakta.', '2-10: 5 pts, J Q K: 10, A: 20. Deck khatam par sab ki ek aakhri baari.'] }
 };
 let dl = null, dlTotal = 30000, dlFlags = {}, tmrI = null, needShuffle = false, prevOver = false, G, S, opts, gid, me = 0, runTok = 0, sel = new Set(), ui = { opt: null }, H = null, inputRes = null, spd = 1, lastFid = -1, tEls = new Map(), hEls = new Map(), AC;
 let online = false, ws = null, room = null, wantRoom = null, retry = 0, pendT = null, overT = null;
@@ -148,23 +148,37 @@ function onlineSheet() {
       else { const code = $('cd').value.trim().toUpperCase(); if (code.length != 4) return toast('4 letter ka code daalein'); connect(() => wsSend({ t: 'join', code, name, token: LS.get('pb_tok') })); }
     });
 }
+function statsHtml(st, compact) {
+  if (!st || !st.rounds) return '<p class="sub" style="text-align:center;margin:6px 0">Abhi koi round nahi khela gaya.</p>';
+  const row = (x, i) => `<div class="sr"><b>${i + 1}</b><span>${esc(x.name)}</span><em>${x.wins} jeet / ${x.played}</em></div>`;
+  return `<div class="lab">Room scoreboard (${st.rounds} round)</div>${st.players.slice(0, compact ? 4 : 10).map(row).join('')}${st.pairs.length ? '<div class="lab">Jodiyan (teams)</div>' + st.pairs.slice(0, compact ? 2 : 6).map(row).join('') : ''}`;
+}
 function renderLobby() {
   const r = room, i = INFO[r.game], link = location.origin + location.pathname + '?room=' + r.code;
+  const me0 = r.players[r.you], seat = (p, k) => `<div class="ls ${p ? '' : 'bot'}"><span class="av">${p ? esc(p.name[0]) : '🤖'}</span><span>${p ? esc(p.name) + (k === r.you ? ' (aap)' : '') + (p.host ? ' · host' : '') + (p.on ? '' : ' · offline') : 'Bot'}</span></div>`;
   let seats = '';
-  for (let k = 0; k < r.n; k++) { const p = r.players[k], team = (r.game == 'rung' || r.game == 'band') && r.n == 4 ? '<em class="tm t' + (k % 2) + '">Team ' + 'AB'[k % 2] + '</em>' : ''; seats += `<div class="ls ${p ? '' : 'bot'}"><span class="av">${p ? esc(p.name[0]) : '🤖'}</span><span>${p ? esc(p.name) + (k == r.you ? ' (aap)' : '') + (k == 0 ? ' · host' : '') + (p.on ? '' : ' · offline') : 'Bot'}</span>${team}</div>`; }
+  if (r.teamMode) {
+    const T = [0, 1].map(t => r.players.map((p, k) => [p, k]).filter(x => x[0].team === t)), U = r.players.map((p, k) => [p, k]).filter(x => x[0].team == null);
+    seats = [0, 1].map(t => `<div class="tbox t${t}"><div class="th"><em class="tm t${t}">Team ${'AB'[t]}</em><button class="chip ${me0 && me0.team === t ? 'on' : ''}" data-tm="${t}" ${me0 && me0.team === t ? '' : T[t].length >= 2 ? 'disabled' : ''}>${me0 && me0.team === t ? 'Aap yahan hain' : 'Yahan baithoo'}</button></div>${T[t].map(x => seat(x[0], x[1])).join('')}${T[t].length < 2 ? '<div class="ls bot"><span class="av">🤖</span><span>Bot (ya dost)</span></div>' : ''}</div>`).join('') +
+      (U.length ? '<div class="lab">Team nahi chuni (khud barabar ho jayengi)</div>' + U.map(x => seat(x[0], x[1])).join('') : '');
+  } else {
+    for (let k = 0; k < r.n; k++) seats += seat(r.players[k], k);
+  }
   $('lobby').innerHTML = `<header><button id="lback">←</button><div class="hd"><div id="gname2">Room</div></div></header>
     <div class="lwrap"><div class="code">${r.code}</div><p class="sub" style="text-align:center">Doston ko yeh code ya link bhejein</p>
     <button class="ghost" id="cplink" style="margin:0 0 8px">Link copy karo</button>
-    <div class="lab">Players (${r.players.length}/${r.n})</div>${seats}
+    <div class="lab">Players (${r.players.length}/${r.n})${r.teamMode ? ' · apni team chuno, partner saamne baithta hai' : ''}</div>${seats}
     ${r.host ? `<div class="lab">Game</div><div class="chips">${Object.keys(INFO).map(k => `<button class="chip ${k == r.game ? 'on' : ''}" data-g="${k}">${INFO[k].name}</button>`).join('')}</div>
       <div class="lab">Kitne players (khaali seat par bot)</div><div class="chips">${i.players.slice().sort().map(p => `<button class="chip ${p == r.n ? 'on' : ''}" data-n="${p}" ${p < r.players.length ? 'disabled' : ''}>${p}</button>`).join('')}</div>
-      ${r.players.length > 2 ? '<button class="ghost" id="shuf">Seats badlo (teams shuffle)</button>' : ''}
+      ${r.players.length > 2 ? '<button class="ghost" id="shuf">' + (r.teamMode ? 'Teams random banao' : 'Seats badlo') + '</button>' : ''}
       <button class="big" id="lgo">${i.name} shuru karo</button>` : `<p class="wait">Game: <b style="color:${i.col}">${i.name}</b> · Host shuru kare ga, intezar karein…</p>`}
+    ${statsHtml(r.stats)}
     </div>`;
   $('lobby').onclick = e => {
     const t = e.target.closest('button'); if (!t) return;
     if (t.id == 'lback') return leaveRoom();
     if (t.id == 'cplink') { try { navigator.clipboard.writeText(link).then(() => toast('Link copy ho gaya'), () => toast(link)); } catch (x) { toast(link); } return; }
+    if (t.dataset.tm) return wsSend({ t: 'team', team: +t.dataset.tm });
     if (t.dataset.g) return wsSend({ t: 'cfg', game: t.dataset.g, n: r.n });
     if (t.dataset.n) return wsSend({ t: 'cfg', game: r.game, n: +t.dataset.n });
     if (t.id == 'shuf') return wsSend({ t: 'shuffle', rot: 1 });
@@ -270,7 +284,7 @@ function showOver() {
   if (!S || !S.over) return;
   const o = S.over, win = o.winners.includes(me), title = (o.top === me && o.titleTop) || (win ? o.titleWin : o.titleLose), canNext = o.next;
   $('over').hidden = false;
-  $('over').innerHTML = `<div class="ocard ${win ? 'win' : 'lose'}"><div class="oemo">${win ? '🏆' : '😵'}</div><h2>${esc(title)}</h2>${o.lines.map(l => '<p>' + esc(l) + '</p>').join('')}${o.log ? '<details class="log"><summary>Har hath ka hisaab dekho</summary>' + o.log.map(l => '<div>' + l + '</div>').join('') + '</details>' : ''}<button class="big" id="again">${canNext ? 'Agla round' : 'Dobara khelo'}</button><button class="ghost" id="tohome">${online ? (room && room.host ? 'Lobby (game badlo)' : 'Room chhor do') : 'Home'}</button></div>` + (win ? Array.from({ length: 36 }, (_, i) => `<i class="conf" style="left:${Math.random() * 100}%;background:hsl(${i * 37},90%,60%);animation-delay:${Math.random() * .8}s;animation-duration:${1.8 + Math.random() * 1.6}s"></i>`).join('') : '');
+  $('over').innerHTML = `<div class="ocard ${win ? 'win' : 'lose'}"><div class="oemo">${win ? '🏆' : '😵'}</div><h2>${esc(title)}</h2>${o.lines.map(l => '<p>' + esc(l) + '</p>').join('')}${o.log ? '<details class="log"><summary>Har hath ka hisaab dekho</summary>' + o.log.map(l => '<div>' + l + '</div>').join('') + '</details>' : ''}${online && room ? '<details class="log"><summary>Room scoreboard</summary>' + statsHtml(room.stats, true) + '</details>' : ''}<button class="big" id="again">${canNext ? 'Agla round' : 'Dobara khelo'}</button><button class="ghost" id="tohome">${online ? (room && room.host ? 'Lobby (game badlo)' : 'Room chhor do') : 'Home'}</button></div>` + (win ? Array.from({ length: 36 }, (_, i) => `<i class="conf" style="left:${Math.random() * 100}%;background:hsl(${i * 37},90%,60%);animation-delay:${Math.random() * .8}s;animation-duration:${1.8 + Math.random() * 1.6}s"></i>`).join('') : '');
   const txt = o.lines.join(' ');
   if (win) { SFX.dhol(2); SFX.win(); setTimeout(() => SFX.voice(/POORA KOT/.test(txt) ? 'kot' : 'win'), 900); }
   else { SFX.lose(); setTimeout(() => SFX.laugh(6), 1300); setTimeout(() => SFX.voice(/GOAN KOT/.test(txt) ? 'goan' : 'lose'), 2000); }
@@ -282,6 +296,10 @@ function showOver() {
 /* ---------- events ---------- */
 $('tiles').onclick = e => { const t = e.target.closest('.tile'); if (t) setup(t.dataset.g); };
 $('onl').onclick = onlineSheet;
+$('lbb').onclick = () => {
+  modal('<h2 style="color:#ffd866">🏆 Leaderboard</h2><p class="sub">Sab rooms ke online khiladi. Jeet ki tadaad se.</p><div id="lbl" class="sub">Load ho raha hai…</div>');
+  fetch('/lb').then(r => r.json()).then(L => { const d = $('lbl'); if (!d) return; d.className = ''; d.innerHTML = L.length ? L.map((x, i) => `<div class="sr"><b>${['🥇', '🥈', '🥉'][i] || i + 1}</b><span>${esc(x.name)}</span><em>${x.wins} jeet / ${x.played}</em></div>`).join('') : '<p class="sub">Abhi koi online game nahi hui. Doston ke saath khelo, naam yahan aayega.</p>'; }).catch(() => { const d = $('lbl'); if (d) d.textContent = 'Leaderboard sirf hosted link par dikhta hai.'; });
+};
 $('back').onclick = () => modal('<h2>Game chhor dein?</h2><p class="sub">' + (online ? 'Aap room se nikal jayenge, aap ki jagah bot khele ga.' : 'Yeh round khatam ho jaye ga.') + '</p><button class="big" id="yes">Haan, Home</button>', e => { if (e.target.id == 'yes') online ? leaveRoom() : home(); });
 $('help').onclick = () => modal(`<h2 style="color:${INFO[gid].col}">${INFO[gid].name}: rules</h2><ul class="rules">${INFO[gid].rules.map(r => '<li>' + r + '</li>').join('')}</ul>${S.log && S.log.length ? '<h2 style="font-size:19px">Ab tak ke hath</h2><div class="log open">' + S.log.map(l => '<div>' + l + '</div>').join('') + '</div>' : ''}`);
 const MI = ['🔇', '🔉', '🔊'], MT = ['Awaz band', 'Sirf sounds', 'Sounds + Urdu awazen'];

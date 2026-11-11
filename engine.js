@@ -361,14 +361,16 @@ const Daketi = {
   ok(s, p, a) {
     const m = this.matches(s, p);
     if (a.t == 'cap') return m.some(c => c.id === a.c);
-    if (a.t == 'disc') return !m.length && s.final == null && s.hands[p].some(c => c.id === a.c);
-    return a.t == 'pass' && s.final != null && !m.length;
+    if (a.t == 'disc') return s.final == null && s.hands[p].some(c => c.id === a.c);
+    return a.t == 'pass' && s.final != null;
   },
   human(s, sel, opt, me) {
-    const m = this.matches(s, me), fin = s.final != null;
-    if (m.length) { const L = new Set(m.map(c => c.id)); return { single: true, legal: L, hint: 'Match maujood hai: chamakta patta chuno aur daketi maro' + (fin ? ' (aakhri baari, sirf ek match)' : ''), btns: [{ l: 'Match / Daketi', p: 1, d: sel.length != 1 || !L.has(sel[0].id), a: sel.length ? { t: 'cap', c: sel[0].id } : null }] }; }
-    if (fin) return { single: true, legal: new Set(), hint: 'Aakhri baari: koi match nahi', btns: [{ l: 'Pass', p: 1, a: { t: 'pass' } }] };
-    return { single: true, hint: 'Koi match nahi: ek patta market mein phenko', btns: [{ l: 'Market mein phenko', p: 1, d: sel.length != 1, a: sel.length ? { t: 'disc', c: sel[0].id } : null }] };
+    const m = this.matches(s, me), fin = s.final != null, L = new Set(m.map(c => c.id)), one = sel.length == 1;
+    const cap = { l: 'Match / Daketi', p: 1, d: !one || !L.has(sel[0].id), a: sel.length ? { t: 'cap', c: sel[0].id } : null };
+    if (fin) return { single: true, legal: L, hint: m.length ? 'Aakhri baari: match lo ya pass karo (sirf ek match)' : 'Aakhri baari: koi match nahi', btns: m.length ? [cap, { l: 'Pass', a: { t: 'pass' } }] : [{ l: 'Pass', p: 1, a: { t: 'pass' } }] };
+    const dsc = { l: 'Market mein phenko', p: m.length ? 0 : 1, d: !one, a: sel.length ? { t: 'disc', c: sel[0].id } : null };
+    if (m.length) return { single: true, legal: L, hint: 'Match hai (chamakta patta): daketi maro, ya koi bhi patta phenk kar bacha lo', btns: [cap, dsc] };
+    return { single: true, hint: 'Koi match nahi: ek patta market mein phenko', btns: [dsc] };
   },
   status(s) { return 'Daketi  ·  Deck ' + s.deck.length + (s.final != null ? '  ·  Aakhri baari' : ''); },
   seatInfo(s, p) {
