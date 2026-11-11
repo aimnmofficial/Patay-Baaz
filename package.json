@@ -1,0 +1,10 @@
+{
+  "name": "pattay-baaz",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pattay Baaz: Rung, Band Rung, President, Thulla, Bluff, Daketi with friends",
+  "main": "server.js",
+  "scripts": { "start": "node server.js", "test": "node test.js", "build": "python3 build.py" },
+  "engines": { "node": ">=18" },
+  "dependencies": { "ws": "^8.18.0" }
+}

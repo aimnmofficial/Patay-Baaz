@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0b1f1a">
+<title>Pattay Baaz</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#07140f;color:#f3efe2;font-family:'Baloo 2',system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+button{font-family:inherit;color:inherit;border:0;cursor:pointer}
+[hidden]{display:none!important}
+#app{height:100%;max-width:560px;margin:0 auto;position:relative;background:radial-gradient(120% 80% at 50% 0,#12362b,#07140f 70%)}
+/* home */
+#home{height:100%;overflow-y:auto;padding:26px 16px 30px}
+.logo{display:flex;flex-direction:column;align-items:center;margin-bottom:18px}
+.fan{position:relative;width:120px;height:92px}
+.fan .card{position:absolute;left:35px;top:6px;width:50px;height:72px;transform-origin:50% 120%;animation:fanin .7s both}
+.fan .card:nth-child(1){--r:-24deg}.fan .card:nth-child(2){--r:0deg;animation-delay:.1s}.fan .card:nth-child(3){--r:24deg;animation-delay:.2s}
+@keyframes fanin{from{transform:rotate(0) translateY(30px);opacity:0}to{transform:rotate(var(--r))}}
+h1{font-size:44px;line-height:1;margin:6px 0 0;font-weight:800;background:linear-gradient(#ffe89a,#e9a820);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.5px}
+.tagline{opacity:.75;font-size:15px;margin-top:4px;text-align:center}
+#tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{position:relative;text-align:left;padding:14px 14px 12px;border-radius:18px;background:linear-gradient(160deg,#173f33,#0e2a22);border:1px solid #ffffff1a;box-shadow:0 6px 18px #0006;display:flex;flex-direction:column;overflow:hidden;transition:transform .12s}
+.tile:active{transform:scale(.96)}
+.tile .ti{position:absolute;right:-6px;top:-18px;font-size:86px;color:var(--c);opacity:.2}
+.tile .tn{font-size:22px;font-weight:800;color:var(--c);line-height:1.1}
+.tile .tt{font-size:13px;opacity:.8;min-height:34px;line-height:1.25;margin-top:2px}
+.tile .tp{font-size:12px;margin-top:8px;background:#0005;border-radius:99px;padding:1px 10px;align-self:flex-start}
+.foot{text-align:center;opacity:.5;font-size:12px;margin-top:20px}
+/* cards */
+.card{width:52px;height:74px;border-radius:8px;background:linear-gradient(#fff,#f1ede1);color:#1a1a22;box-shadow:0 2px 6px #0007,inset 0 0 0 1px #0002;position:relative;font-family:Georgia,serif}
+.card.red{color:#d2203a}
+.card i{position:absolute;left:4px;top:3px;font-style:normal;font-weight:700;font-size:15px;line-height:.95;text-align:center}
+.card b{position:absolute;right:5px;bottom:1px;font-size:30px;font-weight:400;line-height:1.1}
+.card.back{background:repeating-linear-gradient(45deg,#8c1d2c 0 5px,#a8283a 5px 10px);box-shadow:0 2px 6px #0007,inset 0 0 0 3px #f6e9c8,inset 0 0 0 4px #0003}
+/* game */
+#game{height:100%;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:8px;padding:8px 10px 4px}
+header button{width:38px;height:38px;border-radius:12px;background:#ffffff14;font-size:17px;flex:none}
+.hd{flex:1;min-width:0;text-align:center}
+#gname{font-weight:800;font-size:18px;color:#ffd866;line-height:1}
+#status{font-size:12.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#table{flex:1;position:relative;min-height:230px;margin:14px 8px 2px}
+#felt{position:absolute;inset:7% 9% 9%;border-radius:46%;background:radial-gradient(#23805f,#125240 70%,#0c3a2d);box-shadow:inset 0 0 40px #0008,0 0 0 7px #5b3a1c,0 0 0 9px #2d1b0b,0 10px 30px #000a}
+#seats,#center{position:absolute;inset:0}
+.seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;width:104px;pointer-events:none;z-index:30;transition:opacity .3s}
+.seat.outp{opacity:.45}
+.av{width:44px;height:44px;border-radius:50%;background:linear-gradient(#3b5d8f,#22395c);display:grid;place-items:center;font-weight:800;font-size:20px;border:2px solid #ffffff40;position:relative;box-shadow:0 3px 8px #0008}
+.seat.turn .av{border-color:#ffd866;animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px #ffd86644,0 3px 8px #0008}}
+.cnt{position:absolute;right:-10px;bottom:-4px;min-width:20px;height:24px;padding:0 3px;border-radius:5px;background:#a8283a;border:1.5px solid #f6e9c8;font-size:12px;display:grid;place-items:center}
+.nm{font-size:13px;font-weight:700;background:#000a;border-radius:99px;padding:0 9px;margin-top:2px;line-height:1.4}
+.inf,#meinf{font-size:11px;text-align:center;line-height:1.35}
+.inf u,#meinf u{text-decoration:none;color:#ffd866;font-weight:700}
+.inf em,#meinf em{font-style:normal;display:inline-block;background:#fff;color:#222;border-radius:4px;padding:0 4px;margin:1px;font-weight:700;font-family:Georgia,serif}
+.inf em.lk,#meinf em.lk{background:#ffd866}
+.inf b,#meinf b{color:#ffd866}
+#meinf{min-height:16px;font-size:12px;padding:0 10px}
+#center.trick .tc{position:absolute;margin:-37px 0 0 -26px}
+#center.row{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:6px;padding:22% 17% 24%}
+#center.row.many{gap:4px}
+#center.row.many .tc{width:38px;height:54px}
+#center.row.many .tc b{font-size:20px}#center.row.many .tc i{font-size:13px}
+.tc{animation:fly .38s cubic-bezier(.2,.8,.3,1) both}
+.tc.pop{animation:pop .3s both}.tc.flip{animation:flip .5s both}
+@keyframes fly{from{transform:translate(var(--dx),var(--dy)) scale(.6) rotate(18deg);opacity:.2}}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+@keyframes flip{from{transform:rotateY(90deg) scale(1.15)}to{transform:none}}
+#flash{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(.5);opacity:0;pointer-events:none;z-index:60;background:linear-gradient(#ffe89a,#f0b429);color:#3a2300;font-weight:800;font-size:19px;line-height:1.2;padding:9px 18px;border-radius:16px;text-align:center;max-width:86%;box-shadow:0 8px 30px #000a}
+#flash.go{animation:fl 2.1s both}
+@keyframes fl{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}12%{transform:translate(-50%,-50%) scale(1.08);opacity:1}20%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(.9)}}
+#msg{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;z-index:40;pointer-events:none}
+#msg span{background:#000a;border-radius:99px;padding:1px 12px;font-size:13.5px}
+#msg span.you{background:#ffd866;color:#2c1c00;font-weight:800}
+#hint{text-align:center;font-size:13px;opacity:.85;min-height:20px;padding:2px 12px 0;line-height:1.25}
+#hand{position:relative;margin:0 6px;transition:height .2s}
+.hc{position:absolute;width:var(--cw);height:calc(var(--cw)*1.42);transition:left .25s,top .25s,transform .15s,filter .2s;cursor:pointer}
+.hc.deal{animation:deal .35s both}
+@keyframes deal{from{transform:translateY(-220px) rotate(-20deg) scale(.6);opacity:0}}
+.hc.sel{transform:translateY(-16px);box-shadow:0 0 0 3px #ffd866,0 8px 14px #0008}
+.hc.dim{filter:brightness(.55)}
+.hc.glow{box-shadow:0 0 0 3px #4ade80,0 0 14px #4ade80}
+.hc.new::after{content:'naya';position:absolute;left:50%;top:-9px;transform:translateX(-50%);background:#4dd0e1;color:#012;font:700 9px system-ui;padding:0 5px;border-radius:9px}
+.hc.shake{animation:shake .3s}
+@keyframes shake{25%{margin-left:-5px}75%{margin-left:5px}}
+#strip{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;padding:0 8px}
+#strip .chip{min-width:30px;padding:1px 7px;font-size:14px}
+#btns{display:flex;gap:8px;justify-content:center;padding:6px 10px calc(10px + env(safe-area-inset-bottom));min-height:60px;flex-wrap:wrap}
+.btn{min-width:86px;height:44px;padding:0 16px;border-radius:14px;background:#ffffff1f;font-size:17px;font-weight:700;border:1px solid #ffffff26;transition:transform .1s}
+.btn:active{transform:scale(.94)}
+.btn.pri{background:linear-gradient(#ffe07a,#e9a820);color:#2c1c00;border:0;box-shadow:0 4px 0 #9a6a08}
+.btn.warn{background:linear-gradient(#ff7b7b,#d63447);border:0;box-shadow:0 4px 0 #7d1522;animation:pulse2 .8s infinite}
+@keyframes pulse2{50%{transform:scale(1.06)}}
+.btn.red{color:#ff6b7f;font-size:24px;background:#fff}.btn.blk{color:#111;font-size:24px;background:#fff}
+.btn:disabled{opacity:.4;box-shadow:none}
+#badge{position:absolute;left:2px;top:0;z-index:45;background:#000b;border:2px solid #ffd866;border-radius:14px;padding:3px 8px 4px;text-align:center;line-height:1.1;max-width:104px}
+#badge small{display:block;font-size:11px;color:#ffd866;font-weight:700}
+#badge .bs{width:44px;height:44px;margin:2px auto;border-radius:10px;background:#fff;color:#111;font:38px/44px Georgia,serif}
+#badge .bs.red{color:#d2203a}#badge .bs.q{color:#999;font-weight:700}
+#hno{position:absolute;right:2px;top:0;z-index:45;background:#000b;border-radius:99px;padding:1px 10px;font-size:13px;font-weight:700}
+.seat.turn .nm{background:#ffd866;color:#2c1c00}
+#game.myturn #hand{filter:drop-shadow(0 0 10px #ffd86688)}
+#msg span.you{font-size:16px;padding:2px 16px;animation:pulse2 .9s infinite}
+.log{text-align:left;font:12.5px/1.4 system-ui,sans-serif;margin:8px 0;max-height:34vh;overflow-y:auto}
+.log summary{font:700 15px 'Baloo 2',sans-serif;color:#ffd866;text-align:center;cursor:pointer;padding:4px}
+.log div{padding:4px 2px;border-top:1px solid #ffffff1a}.log i{color:#ffd866;font-style:normal}
+.log.open{max-height:none}
+.card.low::after{content:'= 2';position:absolute;left:50%;top:-10px;transform:translateX(-50%);background:#ff5a5a;color:#fff;font:700 11px system-ui;padding:1px 7px;border-radius:9px;white-space:nowrap;z-index:3}
+b.dk{display:block;white-space:nowrap;font-size:11.5px}
+#meinf .mini{margin-right:12px}#meinf b.dk{display:inline;font-size:13px;margin-right:6px}
+.inf .mini{display:table;margin:3px auto 3px}
+.mini{display:inline-block;position:relative;background:#fff;color:#111;border-radius:5px;font:700 15px/1 Georgia,serif;padding:7px 5px 6px;margin:2px 6px 2px 0;vertical-align:middle;box-shadow:0 0 0 2px #ffd866,0 2px 5px #0008}
+.mini.red{color:#d2203a}
+.mini s{position:absolute;right:-9px;top:-8px;background:#ffd866;color:#2c1c00;border-radius:9px;font:700 10px system-ui;padding:1px 4px;text-decoration:none}
+/* online */
+.onl{margin:0 0 2px;background:linear-gradient(#7ee0a1,#2fae62);box-shadow:0 5px 0 #17703a;color:#04260f}
+.onl:active{box-shadow:0 2px 0 #17703a}
+input{width:100%;height:48px;border-radius:14px;border:1px solid #ffffff33;background:#0006;color:#fff;font:700 19px 'Baloo 2',sans-serif;padding:0 14px;outline:none;margin-top:4px}
+input:focus{border-color:#ffd866}
+.row{display:flex;gap:8px;align-items:center;margin-top:4px}.row input{margin:0}
+#lobby{height:100%;overflow-y:auto}
+.lwrap{padding:4px 18px 30px}
+.code{font-size:64px;font-weight:800;letter-spacing:10px;text-align:center;color:#ffd866;line-height:1.1;text-indent:10px}
+.ls{display:flex;align-items:center;gap:10px;background:#ffffff12;border-radius:14px;padding:6px 10px;margin-top:6px;font-size:17px;font-weight:700}
+.ls.bot{opacity:.55}.ls .av{width:36px;height:36px;font-size:17px;flex:none}
+.ls .tm{margin-left:auto;font-style:normal;font-size:12px;border-radius:99px;padding:0 9px}.tm.t0{background:#ffd866;color:#2c1c00}.tm.t1{background:#4dd0e1;color:#012}
+.wait{text-align:center;margin-top:18px;font-size:17px;opacity:.9}
+.chip:disabled{opacity:.3}
+#toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:#000e;border:1px solid #ffffff33;border-radius:14px;padding:8px 16px;font-size:15px;max-width:86%;text-align:center;z-index:200;opacity:0;pointer-events:none}
+#toast.go{animation:tst 3.4s both}
+@keyframes tst{8%{opacity:1}85%{opacity:1}100%{opacity:0}}
+/* modal */
+#modal,#over{position:absolute;inset:0;z-index:100;background:#000b;display:grid;place-items:end center;overflow:hidden}
+#over{place-items:center}
+.sheet{width:100%;max-height:88%;overflow-y:auto;background:#12281f;border-radius:22px 22px 0 0;padding:18px 18px 24px;position:relative;animation:up .25s;border-top:1px solid #ffffff2a}
+@keyframes up{from{transform:translateY(60%)}}
+.sheet h2{margin:0;font-size:26px;line-height:1.1}.sub{margin:2px 0 8px;opacity:.75}
+.x{position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:50%;background:#ffffff1a}
+.lab{font-size:13px;opacity:.7;margin-top:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.chip{padding:4px 16px;border-radius:99px;background:#ffffff14;font-size:16px;font-weight:700;border:1px solid #ffffff22}
+.chip.on{background:#ffd866;color:#2c1c00}
+.rules{padding-left:18px;margin:12px 0;font:14px/1.45 system-ui,sans-serif;opacity:.9}
+.rules li{margin-bottom:5px}
+.big{width:100%;height:52px;border-radius:16px;background:linear-gradient(#ffe07a,#e9a820);color:#2c1c00;font-size:21px;font-weight:800;box-shadow:0 5px 0 #9a6a08;margin-top:8px}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 #9a6a08}
+.ghost{width:100%;height:44px;background:none;font-size:16px;opacity:.8;margin-top:8px}
+.ocard{width:86%;max-width:380px;background:#12281f;border-radius:24px;padding:20px;text-align:center;border:2px solid #ffffff2a;animation:pop .35s;z-index:2}
+.ocard.win{border-color:#ffd866}
+.ocard h2{margin:0 0 6px;font-size:30px;color:#ffd866}.ocard.lose h2{color:#ff8a8a}
+.ocard p{margin:2px 0;font-size:15px;opacity:.9}
+.oemo{font-size:54px;line-height:1.1}
+.conf{position:absolute;top:-12px;width:9px;height:15px;border-radius:2px;animation:fall linear both;z-index:1}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+@media (min-height:760px){.card{width:56px;height:80px}#center.trick .tc{margin:-40px 0 0 -28px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="home">
+    <div class="logo">
+      <div class="fan"><div class="card red"><i>A<br>♥&#xFE0E;</i><b>♥&#xFE0E;</b></div><div class="card"><i>K<br>♠&#xFE0E;</i><b>♠&#xFE0E;</b></div><div class="card red"><i>2<br>♦&#xFE0E;</i><b>♦&#xFE0E;</b></div></div>
+      <h1>Pattay Baaz</h1>
+      <div class="tagline">Dosti apni jagah, patte apni jagah</div>
+    </div>
+    <button id="onl" class="big onl">👥 Doston ke saath khelo</button>
+    <div class="lab" style="text-align:center;margin:14px 0 8px">Ya bots ke saath practice</div>
+    <div id="tiles"></div>
+    <div class="foot">Pattay Baaz · asli shuffle, server par fair game</div>
+  </div>
+  <div id="game" hidden>
+    <header><button id="back">←</button><div class="hd"><div id="gname"></div><div id="status"></div></div><button id="help">?</button><button id="snd"></button></header>
+    <div id="table"><div id="felt"></div><div id="center"></div><div id="seats"></div><div id="badge" hidden></div><div id="hno" hidden></div><div id="flash"></div><div id="msg"></div></div>
+    <div id="hint"></div>
+    <div id="meinf"></div>
+    <div id="hand"></div>
+    <div id="strip"></div>
+    <div id="btns"></div>
+    <div id="over" hidden></div>
+  </div>
+  <div id="lobby" hidden></div>
+  <div id="modal" hidden></div>
+  <div id="toast"></div>
+</div>
+<script>/* Pattay Baaz rules engine. Pure logic, no DOM: runs in browser now, on a Node server later. */
+(function (root) {
+const SUITS = ['♠︎', '♥︎', '♦︎', '♣︎'];
+const rl = r => ({ 11: 'J', 12: 'Q', 13: 'K', 14: 'A' })[r] || '' + r;
+const cn = c => rl(c.r) + SUITS[c.s];
+const CR = root.crypto || require('crypto').webcrypto;
+function rnd(n) { if (n <= 1) return 0; const u = new Uint32Array(1), lim = Math.floor(4294967296 / n) * n; do CR.getRandomValues(u); while (u[0] >= lim); return u[0] % n; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function newDeck() { const d = []; for (let s = 0; s < 4; s++) for (let r = 2; r <= 14; r++) d.push({ r, s, id: s * 13 + r - 2 }); return d; }
+const SO = [0, 1, 3, 2];
+const bySuit = (a, b) => SO[a.s] - SO[b.s] || b.r - a.r;
+const byRank = (a, b) => b.r - a.r || SO[a.s] - SO[b.s];
+const take = (h, id) => h.splice(h.findIndex(c => c.id === id), 1)[0];
+const nextAct = (s, p) => { do p = (p + 1) % s.n; while (s.out[p]); return p; };
+const flash = (s, t) => { s.flash = t; s.fid = (s.fid || 0) + 1; };
+const active = s => s.out.filter(x => !x).length;
+const base = (g, o) => ({ g, n: o.n, names: o.names, hands: Array.from({ length: o.n }, () => []), table: [], tableMode: 'trick', out: Array(o.n).fill(false), turn: -1, msg: '', flash: null, fid: 0, over: null, pend: null });
+const dealAll = (s, sorter) => { const d = shuffle(newDeck()), st = rnd(s.n); for (let p = 0; p < s.n; p++) s.hands[p] = []; d.forEach((c, i) => s.hands[(st + i) % s.n].push(c)); s.hands.forEach(h => h.sort(sorter)); };
+const lo = (a, f) => a.reduce((m, c) => f(c) < f(m) ? c : m);
+const hi = (a, f) => a.reduce((m, c) => f(c) > f(m) ? c : m);
+
+/* ---------------- RUNG (4P teams, 3P solo) and BAND RUNG ---------------- */
+const Rung = {
+  create(o, prev) {
+    const s = base(o.band ? 'band' : 'rung', o);
+    s.band = !!o.band; s.T = s.n == 4 ? 13 : 17; s.minPick = s.n == 4 ? 5 : 7; s.lim = s.n == 4 ? 6 : 9;
+    s.trump = null; s.sar = Array(s.n == 4 ? 2 : 3).fill(0); s.pile = 0; s.trickNo = 1; s.senior = null; s.aceWinner = null; s.caller = null; s.phase = 'draw';
+    s.match = prev ? prev.match : { wins: s.sar.map(() => 0), round: 0, ptr: [0, 0], last: null };
+    const m = s.match; m.round++;
+    let d = shuffle(newDeck());
+    if (s.n == 3) { const x = d.filter(c => c.r == 2)[rnd(4)]; d = d.filter(c => c !== x); s.removed = x; }
+    s.deck = d;
+    if (m.last == null) {
+      if (s.band) { const w = rnd(s.n); m.ptr[w % 2] = (w >> 1) + 1; this.deal(s, w); }
+      else {
+        let pick, mx;
+        do { pick = shuffle(newDeck()).slice(0, s.n); mx = Math.max(...pick.map(x => x.r)); } while (pick.filter(c => c.r == mx).length > 1);
+        const w = pick.findIndex(c => c.r == mx);
+        s.table = pick.map((c, p) => ({ c, p }));
+        s.msg = 'Sab se bara patta ' + s.names[w] + ' ka: rung wohi rakhe ga';
+        s.pend = { ms: 2400, kind: 'draw', w };
+      }
+    } else {
+      let w;
+      if (s.n == 4) { const t = m.last; w = [t, t + 2][m.ptr[t] % 2]; m.ptr[t]++; } else w = m.last;
+      this.deal(s, w);
+    }
+    return s;
+  },
+  deal(s, w) {
+    s.table = []; s.msg = ''; const d = s.deck;
+    if (s.band) { for (let p = 0; p < s.n; p++) s.hands[p] = d.slice(p * s.T, (p + 1) * s.T).sort(bySuit); s.phase = 'play'; s.turn = w; }
+    else { s.caller = w; for (let p = 0; p < s.n; p++) s.hands[p] = d.slice(p * 5, p * 5 + 5).sort(bySuit); s.rest = d.slice(s.n * 5); s.phase = 'pick'; s.turn = w; }
+    if (s.removed) flash(s, cn(s.removed) + ' deck se nikal diya gaya');
+  },
+  legal(s, p) { const h = s.hands[p]; if (!s.table.length) return h.slice(); const led = s.table[0].c.s, f = h.filter(c => c.s === led); return f.length ? f : h.slice(); },
+  best(s) { let b = s.table[0]; for (const x of s.table.slice(1)) { if (x.c.s === b.c.s ? x.e > b.e : x.c.s === s.trump) b = x; } return b; },
+  act(s, p, a) {
+    if (s.phase == 'pick') {
+      const k = s.T - 5; let tr, hs, tries = 0;
+      do { shuffle(s.rest); hs = s.hands.map((h, i) => h.concat(s.rest.slice(i * k, (i + 1) * k))); tr = a.t == 'last' ? hs[p][s.T - 1].s : a.s; }
+      while (++tries < 3000 && hs.some(h => h.filter(c => c.s == tr).length > s.lim));
+      s.hands = hs.map(h => h.sort(bySuit)); s.trump = tr; s.phase = 'play'; s.turn = p;
+      flash(s, s.names[p] + ' ne rung rakha: ' + SUITS[tr]); return;
+    }
+    const c = take(s.hands[p], a.c), led = s.table.length ? s.table[0].c.s : null;
+    if (s.band && s.trump == null && led != null && c.s !== led) { s.trump = c.s; s.caller = p; flash(s, s.names[p] + ' ne rung rakha: ' + SUITS[c.s]); }
+    const e = (c.r == 14 && s.aceWinner === p && s.trickNo < s.T) ? 2 : c.r;
+    s.table.push({ c, p, e, low: e != c.r });
+    if (e != c.r) flash(s, 'Ace rule: ' + s.names[p] + ' ka yeh Ace 2 gina jaye ga');
+    if (s.table.length == s.n) { const w = this.best(s).p; s.turn = -1; s.msg = s.names[w] + ' ne yeh hath jeeta'; s.pend = { ms: 1500, kind: 'trick', w }; }
+    else s.turn = (p + 1) % s.n;
+  },
+  resolve(s) {
+    const pd = s.pend; s.pend = null;
+    if (pd.kind == 'draw') { if (s.n == 4) s.match.ptr[pd.w % 2] = (pd.w >> 1) + 1; this.deal(s, pd.w); return; }
+    const w = pd.w, we = s.table.find(x => x.p == w), tm = s.n == 4 ? w % 2 : w; s.msg = '';
+    s.aceWinner = (we.c.r == 14 && we.e == 14) ? w : null;
+    const cards = s.table.map(x => s.names[x.p] + ' ' + cn(x.c) + (x.e != x.c.r ? '(=2)' : '')).join(', ');
+    s.table = []; s.pile++;
+    const can = !s.band || s.trump != null, who = s.names[w];
+    let note = '';
+    if (s.trickNo == s.T) { note = 'AAKHRI HATH: bachi hui ' + s.pile + ' sar ' + who + ' ko mili'; flash(s, 'Aakhri hath ' + s.names[w] + ' ne jeeta: bachi hui ' + s.pile + ' sar us ki'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
+    else if (can && s.senior === w && s.trickNo >= s.minPick) { note = who + ' ne lagatar 2 hath jeet kar ' + s.pile + ' sar uthai'; flash(s, s.names[w] + ' ne ' + s.pile + ' sar utha li!'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
+    else { s.senior = can ? w : null; note = can ? who + ' senior, beech mein ' + s.pile + ' sar' : 'rung abhi band, beech mein ' + s.pile + ' sar'; }
+    (s.log = s.log || []).push('<b>Hath ' + s.trickNo + ':</b> ' + cards + '. Jeeta: ' + s.names[w] + '. ' + note + '. <i>Sar ' + s.sar.join(' - ') + '</i>');
+    s.trickNo++;
+    const mx = Math.max(...s.sar), mn = Math.min(...s.sar);
+    if (s.trickNo > s.T || (s.n == 4 && mx >= 7 && mn >= 1)) return this.finish(s);
+    s.turn = w;
+  },
+  finish(s) {
+    const m = s.match, wt = s.sar.indexOf(Math.max(...s.sar)), ct = s.caller == null ? null : (s.n == 4 ? s.caller % 2 : s.caller);
+    let kot = '';
+    if (s.sar[wt] == s.T) kot = (ct != null && ct !== wt) ? 'GOAN KOT! Rung wali team 13-0 se haari' : 'POORA KOT!';
+    else if (s.n == 3 && ct != null && s.sar[ct] == 0) kot = 'GOAN KOT! Rung rakhne wala ek sar bhi na le saka';
+    m.wins[wt]++; m.last = wt;
+    const tn = t => s.n == 4 ? s.names[t] + ' + ' + s.names[t + 2] : s.names[t];
+    s.turn = -1;
+    s.over = { winners: s.n == 4 ? [wt, wt + 2] : [wt], titleWin: 'Jeet gaye!', titleLose: 'Haar gaye!', next: true, log: s.log,
+      lines: ['Jeet: ' + tn(wt), 'Sar: ' + s.sar.map((v, t) => tn(t) + ' ' + v).join('  |  '), kot || 'Sada jeet', 'Match (rounds jeete): ' + m.wins.join(' - ')] };
+  },
+  bot(s, p) {
+    const h = s.hands[p];
+    if (s.phase == 'pick') { const cnt = [0, 0, 0, 0]; h.forEach(c => cnt[c.s] += 10 + c.r / 10); return { t: 'trump', s: cnt.indexOf(Math.max(...cnt)) }; }
+    const L = this.legal(s, p), ev = c => (c.r == 14 && s.aceWinner === p && s.trickNo < s.T) ? 2 : c.r, isT = c => c.s === s.trump;
+    const P = c => ({ t: 'play', c: c.id });
+    const nonT = L.filter(c => !isT(c));
+    if (!s.table.length) {
+      const want = s.senior === p && s.trickNo >= s.minPick, tr = L.filter(isT);
+      if (want) { const b = hi(nonT.length ? nonT : L, ev); if (ev(b) == 14) return P(b); if (tr.length) return P(hi(tr, ev)); return P(b); }
+      const pool = nonT.length ? nonT : L, b = hi(pool, ev); return P(ev(b) >= 13 || Math.random() < .4 ? b : lo(pool, ev));
+    }
+    const led = s.table[0].c.s, cur = this.best(s), pw = s.n == 4 && cur.p % 2 == p % 2, last = s.table.length == s.n - 1;
+    if (L[0].s === led) {
+      if (pw && (last || cur.e >= 12 || cur.p === s.senior)) return P(lo(L, ev));
+      if (isT(cur.c) && led !== s.trump) return P(lo(L, ev));
+      const win = L.filter(c => ev(c) > cur.e);
+      if (!win.length) return P(lo(L, ev));
+      return P(last ? lo(win, ev) : hi(win, ev));
+    }
+    if (s.band && s.trump == null) { const cnt = [0, 0, 0, 0]; L.forEach(c => cnt[c.s]++); const bs = cnt.indexOf(Math.max(...cnt)); return P(lo(L.filter(c => c.s == bs), ev)); }
+    if (pw) return P(lo(nonT.length ? nonT : L, ev));
+    let tr = L.filter(isT); if (isT(cur.c)) tr = tr.filter(c => ev(c) > cur.e);
+    if (tr.length) return P(lo(tr, ev));
+    return P(lo(nonT.length ? nonT : L, ev));
+  },
+  ok(s, p, a) {
+    if (s.phase == 'pick') return a.t == 'last' || (a.t == 'trump' && [0, 1, 2, 3].includes(a.s));
+    return s.phase == 'play' && a.t == 'play' && this.legal(s, p).some(c => c.id === a.c);
+  },
+  human(s, sel, opt, me) {
+    if (s.phase == 'pick') return { hint: 'Apne 5 patte dekh kar rung chuno', btns: [0, 1, 2, 3].map(x => ({ l: SUITS[x], a: { t: 'trump', s: x }, cls: x == 1 || x == 2 ? 'red' : 'blk' })).concat([{ l: 'Aakhri patta', a: { t: 'last' } }]) };
+    const L = new Set(this.legal(s, me).map(c => c.id));
+    const lowAce = s.aceWinner === me && s.trickNo < s.T && s.hands[me].some(c => c.r == 14);
+    return { single: true, legal: L, lowIds: lowAce ? new Set(s.hands[me].filter(c => c.r == 14).map(c => c.id)) : null, hint: lowAce ? 'Dhyan: pichla hath aap ne Ace se jeeta, is hath aap ka Ace 2 gina jaye ga' : (s.table.length ? 'Suit follow karo' : 'Aap ki chaal'), btns: [{ l: 'Phenko', p: 1, d: sel.length != 1 || !L.has(sel[0].id), a: sel.length ? { t: 'play', c: sel[0].id } : null }] };
+  },
+  status(s, me) { const t = s.trump == null ? (s.band ? 'band' : '?') : SUITS[s.trump], mt = me % 2; return 'Rung ' + t + '  ·  Sar ' + (s.n == 4 ? 'Hum ' + s.sar[mt] + ' : ' + s.sar[1 - mt] + ' Woh' : s.sar.join(' / ')) + '  ·  Beech ' + s.pile; },
+  seatInfo(s, p, me) { const a = []; if (s.n == 4 && p == (me + 2) % 4) a.push('Partner'); if (s.n == 3) a.push('Sar ' + s.sar[p]); if (s.caller === p) a.push('Rung'); if (s.senior === p) a.push('<u>Senior</u>'); return a.join(' · '); }
+};
+
+/* ---------------- THULLA ---------------- */
+const Thulla = {
+  create(o) {
+    const s = base('thulla', o); dealAll(s, bySuit); s.first = true; s.safe = []; s.trickN = s.n;
+    s.turn = s.hands.findIndex(h => h.some(c => c.id === 12));
+    flash(s, s.names[s.turn] + ' ke paas hukm ka ikka hai'); return s;
+  },
+  legal(s, p) { const h = s.hands[p]; if (!s.table.length) return s.first ? h.filter(c => c.id === 12) : h.slice(); const led = s.table[0].c.s, f = h.filter(c => c.s === led); return f.length ? f : h.slice(); },
+  top(s) { const led = s.table[0].c.s; return hi(s.table.filter(x => x.c.s === led), x => x.c.r).p; },
+  act(s, p, a) {
+    const c = take(s.hands[p], a.c), led = s.table.length ? s.table[0].c.s : null;
+    s.table.push({ c, p });
+    if (!s.first && led != null && c.s !== led) { const w = this.top(s); flash(s, 'THULLA! ' + s.names[w] + ' sab uthaye ga'); s.turn = -1; s.pend = { ms: 1700, kind: 'pickup', w }; }
+    else if (s.table.length == s.trickN) { s.turn = -1; s.pend = { ms: 1200, kind: 'discard', w: this.top(s) }; }
+    else s.turn = nextAct(s, p);
+  },
+  resolve(s) {
+    const pd = s.pend, w = pd.w; s.pend = null;
+    if (pd.kind == 'pickup') { s.hands[w].push(...s.table.map(x => x.c)); s.hands[w].sort(bySuit); }
+    s.table = []; s.first = false;
+    for (let p = 0; p < s.n; p++) if (!s.out[p] && !s.hands[p].length) { s.out[p] = true; s.safe.push(p); flash(s, s.names[p] + ' bach gaya!'); }
+    const act = [...Array(s.n).keys()].filter(p => !s.out[p]);
+    if (act.length <= 1) {
+      const loser = act.length ? act[0] : w; s.turn = -1;
+      s.over = { winners: [...Array(s.n).keys()].filter(p => p !== loser), titleWin: 'Bach gaye!', titleLose: 'Thulla lag gaya!', lines: [s.names[loser] + ' haar gaya', 'Bachne ki tarteeb: ' + s.safe.filter(p => p !== loser).map(p => s.names[p]).join(', ')] };
+      return;
+    }
+    s.trickN = act.length; s.turn = s.out[w] ? nextAct(s, w) : w;
+  },
+  bot(s, p) {
+    const L = this.legal(s, p), f = c => c.r, P = c => ({ t: 'play', c: c.id });
+    if (!s.table.length) return P(lo(L, f));
+    const led = s.table[0].c.s;
+    if (L[0].s !== led) return P(hi(L, f));
+    const top = Math.max(...s.table.filter(x => x.c.s === led).map(x => x.c.r)), low = L.filter(c => c.r < top);
+    if (low.length) return P(hi(low, f));
+    return P(s.table.length == s.trickN - 1 ? hi(L, f) : lo(L, f));
+  },
+  ok(s, p, a) { return a.t == 'play' && this.legal(s, p).some(c => c.id === a.c); },
+  human(s, sel, opt, me) {
+    const L = new Set(this.legal(s, me).map(c => c.id));
+    return { single: true, legal: L, hint: s.first && !s.table.length ? 'Hukm ka ikka phenko' : (s.table.length ? 'Suit follow karo, warna thulla maro' : 'Aap ki chaal'), btns: [{ l: 'Phenko', p: 1, d: sel.length != 1 || !L.has(sel[0].id), a: sel.length ? { t: 'play', c: sel[0].id } : null }] };
+  },
+  status(s) { return 'Thulla  ·  Bach gaye: ' + (s.safe.length ? s.safe.map(p => s.names[p]).join(', ') : 'koi nahi'); },
+  seatInfo(s, p) { return s.out[p] ? 'Bach gaya' : ''; }
+};
+
+/* ---------------- PRESIDENT (loser = Gandu) ---------------- */
+const pv = c => c.r == 2 ? 15 : c.r;
+const byPV = (a, b) => pv(b) - pv(a) || SO[a.s] - SO[b.s];
+const President = {
+  create(o, prev) {
+    const s = base('president', o); s.tableMode = 'row'; dealAll(s, byPV); s.order = []; s.pile = null; s.passes = 0; s.round = (prev ? prev.round : 0) + 1; s.phase = 'play';
+    if (prev && prev.order.length == s.n) {
+      const pr = prev.order[0], ga = prev.order[s.n - 1]; s.pr = pr; s.ga = ga;
+      const c = s.hands[ga].shift(); s.hands[pr].push(c); s.hands[pr].sort(byPV); s.drawn = c.id; s.drawnBy = pr;
+      flash(s, s.names[ga] + ' (Gandu) ne ' + cn(c) + ' President ko diya'); s.phase = 'give'; s.turn = pr;
+    } else { s.turn = rnd(s.n); flash(s, 'Spinner: ' + s.names[s.turn] + ' shuru kare ga'); }
+    return s;
+  },
+  valid(s, cs) { return cs.length >= 1 && cs.length <= 4 && cs.every(c => c.r == cs[0].r) && (!s.pile || (cs.length == s.pile.n && pv(cs[0]) >= s.pile.v)); },
+  act(s, p, a) {
+    if (a.t == 'give') { const c = take(s.hands[p], a.c); s.hands[s.ga].push(c); s.hands[s.ga].sort(byPV); s.drawn = c.id; s.drawnBy = s.ga; s.phase = 'play'; s.turn = s.ga; flash(s, 'President ne ek patta Gandu ko diya. ' + s.names[s.ga] + ' ki baari'); return; }
+    if (a.t == 'pass') {
+      s.passes++; const nx = nextAct(s, p), by = s.pile.by;
+      if (nx === by || (s.out[by] && s.passes >= active(s))) { s.pile = null; s.table = []; s.passes = 0; s.turn = s.out[by] ? nextAct(s, by) : by; s.msg = 'Pile saaf, nayi chaal'; }
+      else s.turn = nx; return;
+    }
+    const cs = a.cs.map(id => take(s.hands[p], id));
+    s.pile = { n: cs.length, v: pv(cs[0]), by: p }; s.table = cs.map(c => ({ c, p })); s.passes = 0; s.msg = '';
+    if (!s.hands[p].length) {
+      s.out[p] = true; s.order.push(p); flash(s, s.names[p] + (s.order.length == 1 ? ' President ban gaya!' : ' nikal gaya'));
+      if (active(s) == 1) {
+        const g = s.out.indexOf(false); s.order.push(g); s.turn = -1;
+        s.over = { winners: s.order.slice(0, -1), top: s.order[0], titleTop: 'Aap President!', titleWin: 'Bach gaye!', titleLose: 'Aap Gandu ban gaye!', next: true, lines: s.order.map((q, i) => (i + 1) + '. ' + s.names[q] + (i == 0 ? ' (President)' : i == s.n - 1 ? ' (Gandu)' : '')) };
+        return;
+      }
+    }
+    s.turn = nextAct(s, p);
+  },
+  resolve() {},
+  groups(h) { const g = {}; h.forEach(c => (g[pv(c)] = g[pv(c)] || []).push(c)); return Object.values(g).sort((a, b) => pv(a[0]) - pv(b[0])); },
+  bot(s, p) {
+    const h = s.hands[p], G = this.groups(h);
+    if (s.phase == 'give') return { t: 'give', c: G[0][0].id };
+    if (!s.pile) return { t: 'play', cs: G[0].map(c => c.id) };
+    const ok = G.filter(g => g.length >= s.pile.n && pv(g[0]) >= s.pile.v);
+    if (!ok.length) return { t: 'pass' };
+    const g = ok.find(x => x.length == s.pile.n) || ok[0];
+    if (pv(g[0]) == 15 && h.length > 3 && Math.random() < .4) return { t: 'pass' };
+    return { t: 'play', cs: g.slice(0, s.pile.n).map(c => c.id) };
+  },
+  ok(s, p, a) {
+    const h = s.hands[p];
+    if (s.phase == 'give') return a.t == 'give' && h.some(c => c.id === a.c);
+    if (a.t == 'pass') return !!s.pile;
+    if (a.t != 'play' || !Array.isArray(a.cs) || new Set(a.cs).size != a.cs.length) return false;
+    const cs = a.cs.map(id => h.find(c => c.id === id)); return cs.every(Boolean) && this.valid(s, cs);
+  },
+  human(s, sel, opt, me) {
+    if (s.phase == 'give') return { single: true, hint: 'Aap President hain: Gandu ko apni marzi ka ek patta do', btns: [{ l: 'Gandu ko do', p: 1, d: sel.length != 1, a: sel.length ? { t: 'give', c: sel[0].id } : null }] };
+    return { hint: s.pile ? s.pile.n + ' patte, ' + rl(s.pile.v == 15 ? 2 : s.pile.v) + ' ya us se bare. Ya pass.' : 'Nayi chaal: 1 se 4 same patte', btns: [{ l: 'Phenko', p: 1, d: !this.valid(s, sel), a: { t: 'play', cs: sel.map(c => c.id) } }, { l: 'Pass', d: !s.pile, a: { t: 'pass' } }] };
+  },
+  status(s) { return 'President  ·  Round ' + s.round + (s.pile ? '  ·  Pile: ' + s.pile.n + ' × ' + rl(s.pile.v == 15 ? 2 : s.pile.v) + ' (' + s.names[s.pile.by] + ')' : '  ·  Nayi chaal'); },
+  seatInfo(s, p) { const i = s.order.indexOf(p); return i == 0 ? 'President' : i > 0 ? 'Nikal gaya #' + (i + 1) : ''; }
+};
+
+/* ---------------- BLUFF ---------------- */
+const Bluff = {
+  create(o) { const s = base('bluff', o); s.tableMode = 'row'; s.humans = o.humans || [0]; dealAll(s, byRank); s.pile = []; s.last = null; s.claim = null; s.turn = rnd(s.n); flash(s, 'Spinner: ' + s.names[s.turn] + ' shuru kare ga'); return s; },
+  win(s, p) { s.turn = -1; s.over = { winners: [p], titleWin: 'Jeet gaye!', titleLose: s.names[p] + ' jeet gaya', lines: [s.names[p] + ' ke patte sab se pehle khatam'] }; },
+  act(s, p, a) {
+    const L = s.last;
+    if (a.t == 'check') {
+      s.pend = null; const truth = L.cs.every(c => c.r == s.claim); s.table = L.cs.map(c => ({ c, p: L.p })); s.turn = -1;
+      flash(s, s.names[p] + ': CHECK! ' + (truth ? 'Sach tha, ' + s.names[p] : 'Bluff pakra gaya, ' + s.names[L.p]) + ' pile uthaye ga');
+      s.pend = { ms: 2600, kind: 'reveal', truth, checker: p }; return;
+    }
+    if (a.t == 'pass') {
+      const nx = (p + 1) % s.n;
+      if (nx === L.p) { s.pile = []; s.last = null; s.claim = null; s.table = []; s.turn = nx; s.msg = 'Sab ne pass kiya, pile saaf'; } else s.turn = nx; return;
+    }
+    const cs = a.cs.map(id => take(s.hands[p], id)); if (!L) s.claim = a.rank;
+    s.pile.push(...cs); s.last = { p, cs }; s.table = cs.map(c => ({ c, p, down: true }));
+    s.msg = s.names[p] + ': "' + cs.length + ' × ' + rl(s.claim) + '"'; s.turn = -1; s.pend = { ms: 1900, kind: 'window' };
+  },
+  resolve(s) {
+    const pd = s.pend, L = s.last; s.pend = null;
+    if (pd.kind == 'window') {
+      const bots = shuffle([...Array(s.n).keys()].filter(q => q !== L.p && !s.humans.includes(q)));
+      for (const b of bots) {
+        const own = s.hands[b].filter(c => c.r == s.claim).length; let pr = .04;
+        if (own + L.cs.length > 4) pr = 1; else { if (!s.hands[L.p].length) pr = .65; else if (own + s.pile.length > 4) pr = .3; if (b == (L.p + 1) % s.n && !own) pr += .1; }
+        if (Math.random() < pr) return this.act(s, b, { t: 'check' });
+      }
+      if (!s.hands[L.p].length) return this.win(s, L.p);
+      s.turn = (L.p + 1) % s.n; return;
+    }
+    const loser = pd.truth ? pd.checker : L.p, lead = pd.truth ? L.p : pd.checker;
+    s.hands[loser].push(...s.pile); s.hands[loser].sort(byRank); s.pile = []; s.table = []; s.last = null; s.claim = null; s.msg = '';
+    if (pd.truth && !s.hands[L.p].length) return this.win(s, L.p);
+    s.turn = lead;
+  },
+  bot(s, p) {
+    const h = s.hands[p], g = {}; h.forEach(c => (g[c.r] = g[c.r] || []).push(c));
+    if (!s.last) {
+      if (Math.random() < .18 && h.length > 3) return { t: 'play', cs: [h[rnd(h.length)].id], rank: h[rnd(h.length)].r };
+      const b = Object.values(g).sort((a, b) => b.length - a.length || a[0].r - b[0].r)[0]; return { t: 'play', cs: b.map(c => c.id), rank: b[0].r };
+    }
+    const have = g[s.claim] || [];
+    if (have.length) return { t: 'play', cs: have.map(c => c.id) };
+    if (Math.random() < .5) return { t: 'pass' };
+    const junk = Object.values(g).sort((a, b) => a.length - b.length)[0]; return { t: 'play', cs: [junk[0].id] };
+  },
+  ok(s, p, a) {
+    const L = s.last, h = s.hands[p];
+    if (a.t == 'check') return !!L && L.p !== p;
+    if (a.t == 'pass') return !!L;
+    if (a.t != 'play' || !Array.isArray(a.cs) || a.cs.length < 1 || a.cs.length > 4 || new Set(a.cs).size != a.cs.length) return false;
+    return a.cs.every(id => h.some(c => c.id === id)) && (!!L || (Number.isInteger(a.rank) && a.rank >= 2 && a.rank <= 14));
+  },
+  human(s, sel, opt, me) {
+    const L = s.last, rank = L ? s.claim : (opt != null ? opt : (sel[0] ? sel[0].r : null)), okSel = sel.length >= 1 && sel.length <= 4;
+    const btns = [{ l: okSel ? 'Bolo: ' + sel.length + ' × ' + rl(rank) : 'Patte chuno', p: 1, d: !okSel, a: { t: 'play', cs: sel.map(c => c.id), rank } }];
+    if (L) { btns.push({ l: 'Pass', a: { t: 'pass' } }); if (L.p !== me) btns.push({ l: 'Check!', cls: 'warn', a: { t: 'check' } }); }
+    const strip = (!L && okSel) ? [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2].map(r => ({ l: rl(r), v: r, on: r == rank })) : null;
+    return { hint: L ? 'Rank ' + rl(s.claim) + ' chal raha hai: 1 se 4 patte ulte phenko, pass ya check' : 'Nayi chaal: patte chuno, phir jo rank bolna hai wo chuno', btns, strip };
+  },
+  status(s) { return 'Bluff  ·  Pile ' + s.pile.length + (s.claim ? '  ·  Rank ' + rl(s.claim) : ''); },
+  seatInfo() { return ''; }
+};
+
+/* ---------------- DAKETI ---------------- */
+const pts = c => c.r == 14 ? 20 : c.r >= 11 ? 10 : 5;
+const Daketi = {
+  create(o) {
+    const s = base('daketi', o); s.tableMode = 'row'; s.deck = shuffle(newDeck()); s.market = []; s.col = []; s.lock = []; s.final = null;
+    for (let p = 0; p < s.n; p++) { s.hands[p] = s.deck.splice(0, 4).sort(byRank); s.col[p] = []; s.lock[p] = {}; }
+    this.begin(s, rnd(s.n)); return s;
+  },
+  begin(s, p) { s.turn = p; s.drawn = null; if (s.final == null) this.draw(s, p); },
+  draw(s, p) { const c = s.deck.pop(); s.hands[p].push(c); s.hands[p].sort(byRank); s.drawn = c.id; s.drawnBy = p; },
+  matches(s, p) { const R = new Set(s.market.map(c => c.r)); s.col.forEach((cl, q) => cl.forEach(c => { if (!s.lock[q][c.r]) R.add(c.r); })); return s.hands[p].filter(c => R.has(c.r)); },
+  score(s, p) { return s.col[p].reduce((t, c) => t + pts(c), 0); },
+  act(s, p, a) {
+    s.msg = '';
+    if (a.t == 'cap') {
+      const c = take(s.hands[p], a.c), got = [c], vic = [];
+      s.market = s.market.filter(x => x.r == c.r ? (got.push(x), false) : true);
+      for (let q = 0; q < s.n; q++) if (q != p && !s.lock[q][c.r]) s.col[q] = s.col[q].filter(x => x.r == c.r ? (got.push(x), vic.includes(q) || vic.push(q), false) : true);
+      s.col[p].push(...got);
+      if (s.col[p].filter(x => x.r == c.r).length == 4) { s.lock[p][c.r] = true; flash(s, 'LOCK! ' + s.names[p] + ' ke chaaron ' + rl(c.r)); }
+      else if (vic.length) flash(s, 'DAKETI! ' + s.names[p] + ' ne ' + vic.map(q => s.names[q]).join(', ') + ' ke ' + rl(c.r) + ' chura liye');
+      else s.msg = s.names[p] + ' ne ' + rl(c.r) + ' utha liya';
+      s.table = s.market.map(c => ({ c }));
+      if (s.final != null || !s.deck.length) return this.end(s, p);
+      this.draw(s, p); return;
+    }
+    if (a.t == 'disc') { const c = take(s.hands[p], a.c); s.market.push(c); s.table = s.market.map(c => ({ c, p: c === s.market[s.market.length - 1] ? p : undefined })); }
+    this.end(s, p);
+  },
+  end(s, p) {
+    if (s.final != null) { if (--s.final == 0) return this.finish(s); }
+    else if (!s.deck.length) { s.final = s.n; flash(s, 'Deck khatam! Sab ki ek aakhri baari'); }
+    this.begin(s, (p + 1) % s.n);
+  },
+  finish(s) {
+    const sc = s.hands.map((_, p) => this.score(s, p)), mx = Math.max(...sc); s.turn = -1;
+    s.over = { winners: sc.map((v, p) => v == mx ? p : -1).filter(p => p >= 0), titleWin: 'Jeet gaye!', titleLose: 'Haar gaye!', lines: sc.map((v, p) => s.names[p] + ': ' + v + ' points' + (v == mx ? ' (winner)' : '')) };
+  },
+  resolve() {},
+  gain(s, p, c) { let t = pts(c); s.market.forEach(x => { if (x.r == c.r) t += pts(x); }); s.col.forEach((cl, q) => { if (q != p && !s.lock[q][c.r]) cl.forEach(x => { if (x.r == c.r) t += 2 * pts(x); }); }); return t; },
+  bot(s, p) {
+    const m = this.matches(s, p);
+    if (m.length) return { t: 'cap', c: hi(m, c => this.gain(s, p, c)).id };
+    if (s.final != null) return { t: 'pass' };
+    const h = s.hands[p], cnt = c => h.filter(x => x.r == c.r).length;
+    return { t: 'disc', c: lo(h, c => pts(c) * 10 + cnt(c) * 30 + Math.random()).id };
+  },
+  ok(s, p, a) {
+    const m = this.matches(s, p);
+    if (a.t == 'cap') return m.some(c => c.id === a.c);
+    if (a.t == 'disc') return !m.length && s.final == null && s.hands[p].some(c => c.id === a.c);
+    return a.t == 'pass' && s.final != null && !m.length;
+  },
+  human(s, sel, opt, me) {
+    const m = this.matches(s, me), fin = s.final != null;
+    if (m.length) { const L = new Set(m.map(c => c.id)); return { single: true, legal: L, hint: 'Match maujood hai: chamakta patta chuno aur daketi maro' + (fin ? ' (aakhri baari, sirf ek match)' : ''), btns: [{ l: 'Match / Daketi', p: 1, d: sel.length != 1 || !L.has(sel[0].id), a: sel.length ? { t: 'cap', c: sel[0].id } : null }] }; }
+    if (fin) return { single: true, legal: new Set(), hint: 'Aakhri baari: koi match nahi', btns: [{ l: 'Pass', p: 1, a: { t: 'pass' } }] };
+    return { single: true, hint: 'Koi match nahi: ek patta market mein phenko', btns: [{ l: 'Market mein phenko', p: 1, d: sel.length != 1, a: sel.length ? { t: 'disc', c: sel[0].id } : null }] };
+  },
+  status(s) { return 'Daketi  ·  Deck ' + s.deck.length + (s.final != null ? '  ·  Aakhri baari' : ''); },
+  seatInfo(s, p) {
+    const cl = s.col[p], g = {}; cl.forEach(c => g[c.r] = (g[c.r] || 0) + 1);
+    if (!cl.length) return '<b>0 patte · 0 pts</b>';
+    const top = cl[cl.length - 1];
+    const chips = Object.keys(g).sort((a, b) => b - a).map(r => '<em class="' + (s.lock[p][r] ? 'lk' : '') + '">' + rl(+r) + (s.lock[p][r] ? ' 🔒' : '×' + g[r]) + '</em>').join('');
+    return '<span class="mini' + (top.s == 1 || top.s == 2 ? ' red' : '') + '">' + rl(top.r) + SUITS[top.s] + '<s>' + (s.lock[p][top.r] ? '🔒' : '×' + g[top.r]) + '</s></span><b class="dk">' + cl.length + ' patte · ' + this.score(s, p) + ' pts</b>' + chips;
+  }
+};
+
+root.PB = { SUITS, rl, cn, Games: { rung: Rung, band: Rung, thulla: Thulla, president: President, bluff: Bluff, daketi: Daketi } };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>(function () {
+const { SUITS, rl, Games } = window.PB;
+const $ = id => document.getElementById(id);
+const BOTS = ['Chacha', 'Bubbly', 'Pappu', 'Guddu', 'Sheeda'];
+const INFO = {
+  rung: { name: 'Rung', tag: 'Court Piece, double sar', icon: '♠', col: '#f4c542', players: [4, 3], def: 4,
+    rules: ['4 player: 2 teams, partner saamne. 3 player: sab alag, ek 2 deck se nikalta hai.', 'Pehle 5 patte, phir rung chuno (ya "aakhri patta").', 'Suit follow karna zaroori. Rung sab se upar.', 'Sar beech mein jama hoti hain. Jo player 2 hath lagatar khud jeete (5wen hath se, 3 player mein 7wen se) wo saari utha leta hai.', 'Ace se jeet kar agle hath phir Ace phenko to wo 2 ginta hai (aakhri hath ke ilawa).', '7 sar = jeet (3 player mein 9). 13-0 = Kot.'] },
+  band: { name: 'Band Rung', tag: 'Rung chupa hua', icon: '♥', col: '#ff6b6b', players: [4], def: 4,
+    rules: ['Saare 13 patte baant diye jate hain, rung koi nahi.', 'Jis ke paas chalti suit na ho, wo jo patta phenke us ki suit rung ban jati hai.', 'Rung rakhne ke baad hi sar uthai ja sakti hai: senior ho kar agla hath bhi khud jeeto.', 'Baqi sab Rung jaisa: Ace rule, 7 sar jeet, 13-0 kot.'] },
+  president: { name: 'President', tag: 'Haarne wala Gandu', icon: '♦', col: '#4dd0e1', players: [3, 4, 5, 6], def: 4,
+    rules: ['2 sab se bara, phir A, K ... 3 sab se chhota.', '1 se 4 same patte phenko. Agla utne hi patte, barabar ya bare, ya pass.', 'Sab pass kar dein to pile saaf, aakhri phenkne wala nayi chaal chalta hai.', 'Pehle khatam = President. Aakhri = Gandu.', 'Agle round: Gandu apna sab se bara patta President ko deta hai, President marzi ka ek patta wapas. Gandu pehle khelta hai.'] },
+  thulla: { name: 'Thulla', tag: 'Bhaago, warna uthao', icon: '♣', col: '#81c784', players: [3, 4, 5, 6], def: 4,
+    rules: ['Hukm ka ikka wala shuru karta hai. Pehle hath mein thulla nahi.', 'Suit follow karo. Sab follow karein to patte discard, bara patta agli chaal.', 'Suit na ho to koi bhi patta maro: THULLA. Chalti suit ka sab se bara patta wala sab uthata hai.', 'Jis ke patte khatam wo bach gaya. Aakhri bacha hua haar gaya.'] },
+  bluff: { name: 'Bluff', tag: 'Jhoot bolo, pakre mat jao', icon: '♠', col: '#ba68c8', players: [3, 4, 5, 6], def: 4,
+    rules: ['Patte ulte phenko aur rank bolo, jaise "2 × A". Sach ya jhoot, aap ki marzi.', 'Agle usi rank par 1 se 4 patte aur phenkte hain, ya pass.', 'Koi bhi CHECK bol sakta hai. Jhoot nikla to phenkne wala pile uthata hai, sach nikla to check wala.', 'Jo sacha sabit ho us ki agli baari. Sab pass kar dein to pile saaf.', 'Jis ke patte pehle khatam wo jeeta.'] },
+  daketi: { name: 'Daketi', tag: 'Match karo, chura lo', icon: '♦', col: '#ffb74d', players: [2, 3, 4], def: 4,
+    rules: ['Har baari 1 patta deck se. Haath ka patta same rank se match karo: market, opponents ya apni collection.', 'Match par us rank ke saare khule patte (market + sab opponents) aap ke. Phir ek aur patta uthao.', 'Match na ho to ek patta market mein phenko.', '4 same rank = LOCK, koi nahi chura sakta.', '2-10: 5 pts, J Q K: 10, A: 20. Deck khatam par sab ki ek aakhri baari.'] }
+};
+let G, S, opts, gid, me = 0, runTok = 0, sel = new Set(), ui = { opt: null }, H = null, inputRes = null, spd = 1, lastFid = -1, tEls = new Map(), hEls = new Map(), snd = true, AC;
+let online = false, ws = null, room = null, wantRoom = null, retry = 0, pendT = null, overT = null;
+const LS = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} } };
+snd = LS.get('pb_snd') !== '0'; spd = +LS.get('pb_spd') || 1;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = t => String(t).replace(/[<>&"]/g, '');
+function beep(f, d, v) { if (!snd) return; try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); const o = AC.createOscillator(), g = AC.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.value = v || .06; o.connect(g); g.connect(AC.destination); o.start(); g.gain.exponentialRampToValueAtTime(.001, AC.currentTime + d); o.stop(AC.currentTime + d); } catch (e) {} }
+function toast(t) { const e = $('toast'); e.textContent = t; e.classList.remove('go'); void e.offsetWidth; e.classList.add('go'); }
+function show(id) { ['home', 'game', 'lobby'].forEach(x => $(x).hidden = x != id); }
+
+/* ---------- home + solo setup ---------- */
+function home() {
+  runTok++; online = false; show('home'); closeModal();
+  $('tiles').innerHTML = Object.keys(INFO).map(k => { const i = INFO[k]; return `<button class="tile" data-g="${k}" style="--c:${i.col}"><span class="ti">${i.icon}︎</span><span class="tn">${i.name}</span><span class="tt">${i.tag}</span><span class="tp">${i.players.length > 1 ? Math.min(...i.players) + '-' + Math.max(...i.players) : i.players[0]} players</span></button>`; }).join('');
+}
+function setup(k) {
+  const i = INFO[k]; let n = i.def;
+  const draw = () => modal(`<h2 style="color:${i.col}">${i.name}</h2><p class="sub">${i.tag} · bots ke saath practice</p>
+    <div class="lab">Kitne players (aap + bots)</div><div class="chips">${i.players.map(p => `<button class="chip ${p == n ? 'on' : ''}" data-n="${p}">${p}</button>`).join('')}</div>
+    <div class="lab">Bot ki speed</div><div class="chips"><button class="chip ${spd == 1 ? 'on' : ''}" data-s="1">Normal</button><button class="chip ${spd != 1 ? 'on' : ''}" data-s="0.55">Tez</button></div>
+    <ul class="rules">${i.rules.map(r => '<li>' + r + '</li>').join('')}</ul>
+    <button class="big" id="go">Khelo</button>`, e => {
+      const t = e.target.closest('button'); if (!t) return;
+      if (t.dataset.n) { n = +t.dataset.n; draw(); } else if (t.dataset.s) { spd = +t.dataset.s; LS.set('pb_spd', spd); draw(); } else if (t.id == 'go') { closeModal(); start(k, n); }
+    });
+  draw();
+}
+function modal(html, onclick) { const m = $('modal'); m.innerHTML = '<div class="sheet"><button class="x" id="mx">✕</button>' + html + '</div>'; m.hidden = false; m.onclick = e => { if (e.target === m || e.target.id == 'mx') return closeModal(); onclick && onclick(e); }; }
+function closeModal() { $('modal').hidden = true; $('modal').innerHTML = ''; }
+function resetTable() { sel.clear(); ui.opt = null; lastFid = -1; tEls.forEach(e => e.remove()); tEls.clear(); hEls.forEach(e => e.remove()); hEls.clear(); $('over').hidden = true; }
+
+/* ---------- solo loop ---------- */
+function start(k, n, prev) {
+  online = false; me = 0; gid = k; G = Games[k]; opts = { n, band: k == 'band', names: ['Aap'].concat(BOTS.slice(0, n - 1)), humans: [0] };
+  S = G.create(opts, prev || null);
+  resetTable(); show('game'); $('gname').textContent = INFO[k].name;
+  loop(++runTok);
+}
+async function loop(tok) {
+  while (tok === runTok) {
+    render();
+    if (S.over) { await sleep(700); if (tok === runTok) showOver(); return; }
+    if (S.pend) {
+      const a = await waitPend(S.pend); inputRes = null; if (tok !== runTok) return;
+      if (a) G.act(S, 0, a); else G.resolve(S); continue;
+    }
+    const p = S.turn; let a;
+    if (p === 0) { beep(660, .12, .04); a = await new Promise(r => inputRes = r); inputRes = null; }
+    else { await sleep((650 + Math.random() * 450) * spd); if (tok !== runTok) return; a = G.bot(S, p); }
+    if (tok !== runTok) return;
+    G.act(S, p, a); sel.clear(); ui.opt = null; beep(a.t == 'pass' ? 200 : 340, .07);
+  }
+}
+function waitPend(pd) {
+  return new Promise(res => {
+    let done = false; const ms = pd.ms * (spd == 1 ? 1 : .7), coll = ['trick', 'pickup', 'discard'].includes(pd.kind);
+    inputRes = a => { if (!done) { done = true; res(a); } };
+    if (coll) setTimeout(() => { if (!done) collect(pd); }, Math.max(0, ms - 430));
+    setTimeout(() => { if (!done) { done = true; res(null); } }, ms);
+  });
+}
+function submit(a) {
+  if (!a) return;
+  if (online) { wsSend({ t: 'act', a }); sel.clear(); ui.opt = null; H = null; $('btns').innerHTML = ''; return; }
+  if (inputRes) { const r = inputRes; inputRes = null; r(a); }
+}
+
+/* ---------- online ---------- */
+function wsSend(m) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(m)); }
+function connect(first) {
+  if (!/^https?:$/.test(location.protocol)) return toast('Online sirf hosted link par chalta hai');
+  let sock;
+  try { sock = new WebSocket((location.protocol == 'https:' ? 'wss://' : 'ws://') + location.host + '/ws'); } catch (e) { return toast('Online sirf hosted link par chalta hai'); }
+  ws = sock; let opened = false;
+  sock.onopen = () => { opened = true; retry = 0; first && first(); };
+  sock.onmessage = e => { let m; try { m = JSON.parse(e.data); } catch (x) { return; } onMsg(m); };
+  sock.onclose = () => {
+    if (ws !== sock) return; ws = null;
+    if (!opened) return toast('Server se rabta nahi hua. Yeh link online mode support nahi karta ya server so raha hai, dobara koshish karein.');
+    if (wantRoom && retry < 20) { retry++; toast('Rabta toot gaya, dobara jor raha hun…'); setTimeout(() => connect(() => wsSend({ t: 'join', code: wantRoom, token: LS.get('pb_tok'), name: LS.get('pb_name') })), 1200); }
+  };
+}
+function leaveRoom() { wantRoom = null; LS.set('pb_room', null); wsSend({ t: 'leave' }); const s = ws; ws = null; if (s) try { s.close(); } catch (e) {} room = null; clearTimeout(pendT); clearTimeout(overT); home(); }
+function onMsg(m) {
+  if (m.t == 'err') { toast(m.m); if (!room) { wantRoom = null; LS.set('pb_room', null); } return; }
+  if (m.t == 'room') {
+    room = m; wantRoom = m.code; LS.set('pb_room', m.code); LS.set('pb_tok', m.token); closeModal();
+    if (m.phase == 'lobby') { online = true; runTok++; clearTimeout(pendT); clearTimeout(overT); S = null; renderLobby(); show('lobby'); }
+    return;
+  }
+  if (m.t == 'state') {
+    const fresh = !online || $('game').hidden || !S || S.g !== m.s.g;
+    online = true; runTok++; me = m.me; S = m.s; gid = S.g; G = Games[gid]; opts = { n: S.n };
+    if (fresh) { resetTable(); show('game'); $('gname').textContent = INFO[gid].name + ' · ' + room.code; }
+    clearTimeout(pendT); clearTimeout(overT);
+    if (!S.over) $('over').hidden = true;
+    render();
+    if (S.turn === me && !S.pend && !S.over) beep(660, .12, .04);
+    if (S.pend && ['trick', 'pickup', 'discard'].includes(S.pend.kind)) { const pd = S.pend; pendT = setTimeout(() => collect(pd), Math.max(0, pd.ms - 430)); }
+    if (S.over) overT = setTimeout(showOver, 700);
+  }
+}
+function onlineSheet() {
+  const nm = esc(LS.get('pb_name') || ''), pre = (new URLSearchParams(location.search).get('room') || '').toUpperCase();
+  modal(`<h2 style="color:#ffd866">Doston ke saath</h2><p class="sub">Har dost apne phone se. Khaali seat par bot.</p>
+    <div class="lab">Aap ka naam</div><input id="nm" maxlength="12" placeholder="Naam" value="${nm}">
+    <button class="big" id="mk">Naya room banao</button>
+    <div class="lab" style="margin-top:16px">Ya dost ka room code daalo</div>
+    <div class="row"><input id="cd" maxlength="4" placeholder="CODE" value="${esc(pre)}" style="text-transform:uppercase;letter-spacing:6px;text-align:center"><button class="big" id="jn" style="margin:0;width:44%">Join</button></div>`, e => {
+      const id = e.target.id; if (id != 'mk' && id != 'jn') return;
+      const name = $('nm').value.trim(); if (!name) return toast('Pehle naam likhein');
+      LS.set('pb_name', name);
+      if (id == 'mk') connect(() => wsSend({ t: 'create', name }));
+      else { const code = $('cd').value.trim().toUpperCase(); if (code.length != 4) return toast('4 letter ka code daalein'); connect(() => wsSend({ t: 'join', code, name, token: LS.get('pb_tok') })); }
+    });
+}
+function renderLobby() {
+  const r = room, i = INFO[r.game], link = location.origin + location.pathname + '?room=' + r.code;
+  let seats = '';
+  for (let k = 0; k < r.n; k++) { const p = r.players[k], team = (r.game == 'rung' || r.game == 'band') && r.n == 4 ? '<em class="tm t' + (k % 2) + '">Team ' + 'AB'[k % 2] + '</em>' : ''; seats += `<div class="ls ${p ? '' : 'bot'}"><span class="av">${p ? esc(p.name[0]) : '🤖'}</span><span>${p ? esc(p.name) + (k == r.you ? ' (aap)' : '') + (k == 0 ? ' · host' : '') + (p.on ? '' : ' · offline') : 'Bot'}</span>${team}</div>`; }
+  $('lobby').innerHTML = `<header><button id="lback">←</button><div class="hd"><div id="gname2">Room</div></div></header>
+    <div class="lwrap"><div class="code">${r.code}</div><p class="sub" style="text-align:center">Doston ko yeh code ya link bhejein</p>
+    <button class="ghost" id="cplink" style="margin:0 0 8px">Link copy karo</button>
+    <div class="lab">Players (${r.players.length}/${r.n})</div>${seats}
+    ${r.host ? `<div class="lab">Game</div><div class="chips">${Object.keys(INFO).map(k => `<button class="chip ${k == r.game ? 'on' : ''}" data-g="${k}">${INFO[k].name}</button>`).join('')}</div>
+      <div class="lab">Kitne players (khaali seat par bot)</div><div class="chips">${i.players.slice().sort().map(p => `<button class="chip ${p == r.n ? 'on' : ''}" data-n="${p}" ${p < r.players.length ? 'disabled' : ''}>${p}</button>`).join('')}</div>
+      ${r.players.length > 2 ? '<button class="ghost" id="shuf">Seats badlo (teams shuffle)</button>' : ''}
+      <button class="big" id="lgo">${i.name} shuru karo</button>` : `<p class="wait">Game: <b style="color:${i.col}">${i.name}</b> · Host shuru kare ga, intezar karein…</p>`}
+    </div>`;
+  $('lobby').onclick = e => {
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.id == 'lback') return leaveRoom();
+    if (t.id == 'cplink') { try { navigator.clipboard.writeText(link).then(() => toast('Link copy ho gaya'), () => toast(link)); } catch (x) { toast(link); } return; }
+    if (t.dataset.g) return wsSend({ t: 'cfg', game: t.dataset.g, n: r.n });
+    if (t.dataset.n) return wsSend({ t: 'cfg', game: r.game, n: +t.dataset.n });
+    if (t.id == 'shuf') return wsSend({ t: 'shuffle', rot: 1 });
+    if (t.id == 'lgo') return wsSend({ t: 'start' });
+  };
+}
+
+/* ---------- rendering ---------- */
+const dir = p => { const a = 2 * Math.PI * ((p - me + S.n) % S.n) / S.n; return [Math.sin(a), Math.cos(a)]; };
+function cardEl(c, down) { const d = document.createElement('div'); d.className = 'card' + (down ? ' back' : (c.s == 1 || c.s == 2 ? ' red' : '')); if (!down) d.innerHTML = `<i>${rl(c.r)}<br>${SUITS[c.s]}</i><b>${SUITS[c.s]}</b>`; return d; }
+function render() {
+  const n = S.n, my = S.turn === me && !S.pend && !S.over, hand = S.hands[me];
+  $('status').textContent = G.status(S, me);
+  let h = '';
+  for (let k = 1; k < n; k++) {
+    const p = (me + k) % n, [sx, sy] = dir(p);
+    h += `<div class="seat ${S.turn === p ? 'turn' : ''} ${S.out[p] ? 'outp' : ''}" style="left:${50 + 39 * sx}%;top:${49 + 37 * sy}%"><div class="av">${esc(S.names[p][0])}<span class="cnt">${S.hands[p].length}</span></div><div class="nm">${esc(S.names[p])}${S.turn === p ? ' · BAARI' : ''}</div><div class="inf">${G.seatInfo(S, p, me) || ''}</div></div>`;
+  }
+  $('seats').innerHTML = h;
+  const tb = $('table'), tw = tb.clientWidth, th = tb.clientHeight, ct = $('center'), keys = new Set();
+  ct.className = S.tableMode + (S.table.length > 8 ? ' many' : '');
+  S.table.forEach((it, i) => {
+    const k = it.c.id + (it.down ? 'd' : 'u'); keys.add(k); let el = tEls.get(k);
+    if (!el) {
+      el = cardEl(it.c, it.down); el.classList.add('tc'); if (it.low) el.classList.add('low');
+      const [sx, sy] = it.p != null ? dir(it.p) : [0, 0];
+      el.style.setProperty('--dx', sx * tw * .34 + 'px'); el.style.setProperty('--dy', sy * th * .32 + 'px');
+      if (tEls.has(it.c.id + (it.down ? 'u' : 'd'))) el.classList.add('flip'); else if (it.p == null) el.classList.add('pop');
+      ct.appendChild(el); tEls.set(k, el);
+    }
+    if (S.tableMode == 'trick') { const [sx, sy] = dir(it.p); el.style.left = 50 + 17 * sx + '%'; el.style.top = 46 + 16 * sy + '%'; el.style.zIndex = i; el.style.order = ''; }
+    else { el.style.left = el.style.top = ''; el.style.order = i; }
+  });
+  for (const [k, el] of tEls) if (!keys.has(k)) { el.remove(); tEls.delete(k); }
+  const bd = $('badge');
+  if (gid == 'rung' || gid == 'band') {
+    const t = S.trump, red = t == 1 || t == 2;
+    bd.hidden = false;
+    bd.innerHTML = t == null
+      ? '<small>RUNG</small><div class="bs q">?</div><small>' + (S.band ? 'abhi band hai' : (S.caller != null ? esc(S.names[S.caller]) + ' chun raha hai' : 'faisla ho raha hai')) + '</small>'
+      : '<small>RUNG</small><div class="bs ' + (red ? 'red' : '') + '">' + SUITS[t] + '</div><small>' + (S.caller === me ? 'Aap ne rakha' : esc(S.names[S.caller]) + ' ne rakha') + '</small>';
+    $('hno').hidden = false; $('hno').textContent = 'Hath ' + Math.min(S.trickNo, S.T) + '/' + S.T;
+  } else { bd.hidden = true; $('hno').hidden = true; }
+  if (S.fid !== lastFid) { lastFid = S.fid; if (S.flash) { const f = $('flash'); f.textContent = S.flash; f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); beep(880, .18, .05); } }
+  const selC = hand.filter(c => sel.has(c.id));
+  H = my ? G.human(S, selC, ui.opt, me) : null;
+  let btns = H ? H.btns : [];
+  if (S.pend && S.pend.kind == 'window' && S.last && S.last.p !== me) btns = [{ l: 'CHECK!', cls: 'warn', a: { t: 'check' } }];
+  const who = S.over ? '' : my ? '👉 AAP KI BAARI' : S.turn >= 0 ? 'Baari: ' + esc(S.names[S.turn]) : '';
+  $('msg').innerHTML = (S.msg ? '<span>' + esc(S.msg) + '</span>' : '') + (who ? '<span class="' + (my ? 'you' : '') + '">' + who + '</span>' : '');
+  $('hint').textContent = H ? H.hint || '' : (S.out[me] ? 'Aap nikal gaye, ab tamasha dekho' : '');
+  $('meinf').innerHTML = (online ? '<b>' + esc(S.names[me]) + '</b> ' : '') + (G.seatInfo(S, me, me) || '').replace(/^Rung/, 'Rung aap ne rakha');
+  $('game').classList.toggle('myturn', my);
+  $('strip').innerHTML = H && H.strip ? H.strip.map(o => `<button class="chip ${o.on ? 'on' : ''}" data-v="${o.v}">${o.l}</button>`).join('') : '';
+  const bb = $('btns'); bb.innerHTML = '';
+  btns.forEach(b => { const e = document.createElement('button'); e.className = 'btn ' + (b.p ? 'pri ' : '') + (b.cls || ''); e.textContent = b.l; e.disabled = !!b.d; e.onclick = () => submit(b.a); bb.appendChild(e); });
+  renderHand();
+}
+function renderHand() {
+  const hd = $('hand'), cards = S.hands[me], n = cards.length, W = hd.clientWidth, cw = W < 380 ? 52 : 60, chh = cw * 1.42;
+  const rows = Math.max(1, Math.ceil(n / 13)), per = Math.ceil(n / rows), rowGap = chh * .5, keys = new Set();
+  hd.style.height = (n ? chh + (rows - 1) * rowGap + 18 : 30) + 'px'; hd.style.setProperty('--cw', cw + 'px');
+  cards.forEach((c, i) => {
+    keys.add(c.id); let el = hEls.get(c.id);
+    if (!el) { el = cardEl(c); el.classList.add('hc', 'deal'); el.style.animationDelay = Math.min(i * 28, 500) + 'ms'; el.onclick = () => tapCard(c.id); hd.appendChild(el); hEls.set(c.id, el); }
+    const r = Math.floor(i / per), j = i % per, m = Math.min(per, n - r * per), sp = m > 1 ? Math.min(cw + 6, (W - 10 - cw) / (m - 1)) : 0, x0 = (W - (cw + sp * (m - 1))) / 2;
+    el.style.left = x0 + j * sp + 'px'; el.style.top = 16 + r * rowGap + 'px'; el.style.zIndex = i;
+    el.classList.toggle('sel', sel.has(c.id));
+    el.classList.toggle('dim', !!(H && H.legal && !H.legal.has(c.id)));
+    el.classList.toggle('glow', !!(H && H.legal && H.legal.size && H.legal.has(c.id) && gid == 'daketi'));
+    el.classList.toggle('new', S.drawn === c.id && (online || S.drawnBy === me));
+    el.classList.toggle('low', !!(H && H.lowIds && H.lowIds.has(c.id)));
+  });
+  for (const [k, el] of hEls) if (!keys.has(k)) { el.remove(); hEls.delete(k); }
+}
+function tapCard(id) {
+  if (!H) return;
+  if (H.legal && !H.legal.has(id)) { const e = hEls.get(id); e.classList.remove('shake'); void e.offsetWidth; e.classList.add('shake'); return; }
+  if (H.single) { if (sel.has(id)) { const c = S.hands[me].filter(x => sel.has(x.id)); const b = G.human(S, c, ui.opt, me).btns.find(b => b.p && !b.d); if (b) return submit(b.a); } sel.clear(); sel.add(id); }
+  else if (sel.has(id)) sel.delete(id); else if (sel.size < 4) sel.add(id);
+  ui.opt = null; beep(520, .04, .03); render();
+}
+function collect(pd) {
+  const tb = $('table'), [sx, sy] = pd.kind == 'discard' ? [0, 0] : dir(pd.w);
+  tEls.forEach(el => { el.style.transition = 'transform .42s ease-in, opacity .42s'; el.style.transform = `translate(${sx * tb.clientWidth * .36}px,${sy * tb.clientHeight * .34}px) scale(.35) rotate(${pd.kind == 'discard' ? 0 : 25}deg)`; el.style.opacity = 0; });
+  beep(pd.kind == 'pickup' ? 150 : 440, .15);
+}
+function showOver() {
+  if (!S || !S.over) return;
+  const o = S.over, win = o.winners.includes(me), title = (o.top === me && o.titleTop) || (win ? o.titleWin : o.titleLose), canNext = o.next;
+  $('over').hidden = false;
+  $('over').innerHTML = `<div class="ocard ${win ? 'win' : 'lose'}"><div class="oemo">${win ? '🏆' : '😵'}</div><h2>${esc(title)}</h2>${o.lines.map(l => '<p>' + esc(l) + '</p>').join('')}${o.log ? '<details class="log"><summary>Har hath ka hisaab dekho</summary>' + o.log.map(l => '<div>' + l + '</div>').join('') + '</details>' : ''}<button class="big" id="again">${canNext ? 'Agla round' : 'Dobara khelo'}</button><button class="ghost" id="tohome">${online ? (room && room.host ? 'Lobby (game badlo)' : 'Room chhor do') : 'Home'}</button></div>` + (win ? Array.from({ length: 36 }, (_, i) => `<i class="conf" style="left:${Math.random() * 100}%;background:hsl(${i * 37},90%,60%);animation-delay:${Math.random() * .8}s;animation-duration:${1.8 + Math.random() * 1.6}s"></i>`).join('') : '');
+  beep(win ? 784 : 180, .4, .07);
+  $('again').onclick = () => online ? wsSend({ t: 'next' }) : start(gid, opts.n, canNext ? S : null);
+  $('tohome').onclick = () => online ? (room && room.host ? wsSend({ t: 'lobby' }) : leaveRoom()) : home();
+}
+
+/* ---------- events ---------- */
+$('tiles').onclick = e => { const t = e.target.closest('.tile'); if (t) setup(t.dataset.g); };
+$('onl').onclick = onlineSheet;
+$('back').onclick = () => modal('<h2>Game chhor dein?</h2><p class="sub">' + (online ? 'Aap room se nikal jayenge, aap ki jagah bot khele ga.' : 'Yeh round khatam ho jaye ga.') + '</p><button class="big" id="yes">Haan, Home</button>', e => { if (e.target.id == 'yes') online ? leaveRoom() : home(); });
+$('help').onclick = () => modal(`<h2 style="color:${INFO[gid].col}">${INFO[gid].name}: rules</h2><ul class="rules">${INFO[gid].rules.map(r => '<li>' + r + '</li>').join('')}</ul>${S.log && S.log.length ? '<h2 style="font-size:19px">Ab tak ke hath</h2><div class="log open">' + S.log.map(l => '<div>' + l + '</div>').join('') + '</div>' : ''}`);
+$('snd').onclick = () => { snd = !snd; LS.set('pb_snd', snd ? '1' : '0'); $('snd').textContent = snd ? '🔊' : '🔇'; };
+$('snd').textContent = snd ? '🔊' : '🔇';
+$('strip').onclick = e => { const t = e.target.closest('.chip'); if (t) { ui.opt = +t.dataset.v; render(); } };
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (S && !$('game').hidden) render(); }, 120); });
+home();
+const qRoom = (new URLSearchParams(location.search).get('room') || '').toUpperCase(), saved = LS.get('pb_room');
+if (/^https?:$/.test(location.protocol) && LS.get('pb_name')) {
+  if (saved && LS.get('pb_tok') && (!qRoom || qRoom == saved)) { wantRoom = saved; connect(() => wsSend({ t: 'join', code: saved, token: LS.get('pb_tok'), name: LS.get('pb_name') })); }
+  else if (qRoom) onlineSheet();
+} else if (qRoom) onlineSheet();
+})();
+</script>
+</body>
+</html>

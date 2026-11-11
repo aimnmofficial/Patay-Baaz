@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0b1f1a">
+<title>Pattay Baaz</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#07140f;color:#f3efe2;font-family:'Baloo 2',system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+button{font-family:inherit;color:inherit;border:0;cursor:pointer}
+[hidden]{display:none!important}
+#app{height:100%;max-width:560px;margin:0 auto;position:relative;background:radial-gradient(120% 80% at 50% 0,#12362b,#07140f 70%)}
+/* home */
+#home{height:100%;overflow-y:auto;padding:26px 16px 30px}
+.logo{display:flex;flex-direction:column;align-items:center;margin-bottom:18px}
+.fan{position:relative;width:120px;height:92px}
+.fan .card{position:absolute;left:35px;top:6px;width:50px;height:72px;transform-origin:50% 120%;animation:fanin .7s both}
+.fan .card:nth-child(1){--r:-24deg}.fan .card:nth-child(2){--r:0deg;animation-delay:.1s}.fan .card:nth-child(3){--r:24deg;animation-delay:.2s}
+@keyframes fanin{from{transform:rotate(0) translateY(30px);opacity:0}to{transform:rotate(var(--r))}}
+h1{font-size:44px;line-height:1;margin:6px 0 0;font-weight:800;background:linear-gradient(#ffe89a,#e9a820);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:.5px}
+.tagline{opacity:.75;font-size:15px;margin-top:4px;text-align:center}
+#tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{position:relative;text-align:left;padding:14px 14px 12px;border-radius:18px;background:linear-gradient(160deg,#173f33,#0e2a22);border:1px solid #ffffff1a;box-shadow:0 6px 18px #0006;display:flex;flex-direction:column;overflow:hidden;transition:transform .12s}
+.tile:active{transform:scale(.96)}
+.tile .ti{position:absolute;right:-6px;top:-18px;font-size:86px;color:var(--c);opacity:.2}
+.tile .tn{font-size:22px;font-weight:800;color:var(--c);line-height:1.1}
+.tile .tt{font-size:13px;opacity:.8;min-height:34px;line-height:1.25;margin-top:2px}
+.tile .tp{font-size:12px;margin-top:8px;background:#0005;border-radius:99px;padding:1px 10px;align-self:flex-start}
+.foot{text-align:center;opacity:.5;font-size:12px;margin-top:20px}
+/* cards */
+.card{width:52px;height:74px;border-radius:8px;background:linear-gradient(#fff,#f1ede1);color:#1a1a22;box-shadow:0 2px 6px #0007,inset 0 0 0 1px #0002;position:relative;font-family:Georgia,serif}
+.card.red{color:#d2203a}
+.card i{position:absolute;left:4px;top:3px;font-style:normal;font-weight:700;font-size:15px;line-height:.95;text-align:center}
+.card b{position:absolute;right:5px;bottom:1px;font-size:30px;font-weight:400;line-height:1.1}
+.card.back{background:repeating-linear-gradient(45deg,#8c1d2c 0 5px,#a8283a 5px 10px);box-shadow:0 2px 6px #0007,inset 0 0 0 3px #f6e9c8,inset 0 0 0 4px #0003}
+/* game */
+#game{height:100%;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:8px;padding:8px 10px 4px}
+header button{width:38px;height:38px;border-radius:12px;background:#ffffff14;font-size:17px;flex:none}
+.hd{flex:1;min-width:0;text-align:center}
+#gname{font-weight:800;font-size:18px;color:#ffd866;line-height:1}
+#status{font-size:12.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#table{flex:1;position:relative;min-height:230px;margin:14px 8px 2px}
+#felt{position:absolute;inset:7% 9% 9%;border-radius:46%;background:radial-gradient(#23805f,#125240 70%,#0c3a2d);box-shadow:inset 0 0 40px #0008,0 0 0 7px #5b3a1c,0 0 0 9px #2d1b0b,0 10px 30px #000a}
+#seats,#center{position:absolute;inset:0}
+.seat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;width:104px;pointer-events:none;z-index:30;transition:opacity .3s}
+.seat.outp{opacity:.45}
+.av{width:44px;height:44px;border-radius:50%;background:linear-gradient(#3b5d8f,#22395c);display:grid;place-items:center;font-weight:800;font-size:20px;border:2px solid #ffffff40;position:relative;box-shadow:0 3px 8px #0008}
+.seat.turn .av{border-color:#ffd866;animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px #ffd86644,0 3px 8px #0008}}
+.cnt{position:absolute;right:-10px;bottom:-4px;min-width:20px;height:24px;padding:0 3px;border-radius:5px;background:#a8283a;border:1.5px solid #f6e9c8;font-size:12px;display:grid;place-items:center}
+.nm{font-size:13px;font-weight:700;background:#000a;border-radius:99px;padding:0 9px;margin-top:2px;line-height:1.4}
+.inf,#meinf{font-size:11px;text-align:center;line-height:1.35}
+.inf u,#meinf u{text-decoration:none;color:#ffd866;font-weight:700}
+.inf em,#meinf em{font-style:normal;display:inline-block;background:#fff;color:#222;border-radius:4px;padding:0 4px;margin:1px;font-weight:700;font-family:Georgia,serif}
+.inf em.lk,#meinf em.lk{background:#ffd866}
+.inf b,#meinf b{color:#ffd866}
+#meinf{min-height:16px;font-size:12px;padding:0 10px}
+#center.trick .tc{position:absolute;margin:-37px 0 0 -26px}
+#center.row{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:6px;padding:22% 17% 24%}
+#center.row.many{gap:4px}
+#center.row.many .tc{width:38px;height:54px}
+#center.row.many .tc b{font-size:20px}#center.row.many .tc i{font-size:13px}
+.tc{animation:fly .38s cubic-bezier(.2,.8,.3,1) both}
+.tc.pop{animation:pop .3s both}.tc.flip{animation:flip .5s both}
+@keyframes fly{from{transform:translate(var(--dx),var(--dy)) scale(.6) rotate(18deg);opacity:.2}}
+@keyframes pop{from{transform:scale(.3);opacity:0}}
+@keyframes flip{from{transform:rotateY(90deg) scale(1.15)}to{transform:none}}
+#flash{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(.5);opacity:0;pointer-events:none;z-index:60;background:linear-gradient(#ffe89a,#f0b429);color:#3a2300;font-weight:800;font-size:19px;line-height:1.2;padding:9px 18px;border-radius:16px;text-align:center;max-width:86%;box-shadow:0 8px 30px #000a}
+#flash.go{animation:fl 2.1s both}
+@keyframes fl{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}12%{transform:translate(-50%,-50%) scale(1.08);opacity:1}20%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-70%) scale(.9)}}
+#msg{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;z-index:40;pointer-events:none}
+#msg span{background:#000a;border-radius:99px;padding:1px 12px;font-size:13.5px}
+#msg span.you{background:#ffd866;color:#2c1c00;font-weight:800}
+#hint{text-align:center;font-size:13px;opacity:.85;min-height:20px;padding:2px 12px 0;line-height:1.25}
+#hand{position:relative;margin:0 6px;transition:height .2s}
+.hc{position:absolute;width:var(--cw);height:calc(var(--cw)*1.42);transition:left .25s,top .25s,transform .15s,filter .2s;cursor:pointer}
+.hc.deal{animation:deal .35s both}
+@keyframes deal{from{transform:translateY(-220px) rotate(-20deg) scale(.6);opacity:0}}
+.hc.sel{transform:translateY(-16px);box-shadow:0 0 0 3px #ffd866,0 8px 14px #0008}
+.hc.dim{filter:brightness(.55)}
+.hc.glow{box-shadow:0 0 0 3px #4ade80,0 0 14px #4ade80}
+.hc.new::after{content:'naya';position:absolute;left:50%;top:-9px;transform:translateX(-50%);background:#4dd0e1;color:#012;font:700 9px system-ui;padding:0 5px;border-radius:9px}
+.hc.shake{animation:shake .3s}
+@keyframes shake{25%{margin-left:-5px}75%{margin-left:5px}}
+#strip{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;padding:0 8px}
+#strip .chip{min-width:30px;padding:1px 7px;font-size:14px}
+#btns{display:flex;gap:8px;justify-content:center;padding:6px 10px calc(10px + env(safe-area-inset-bottom));min-height:60px;flex-wrap:wrap}
+.btn{min-width:86px;height:44px;padding:0 16px;border-radius:14px;background:#ffffff1f;font-size:17px;font-weight:700;border:1px solid #ffffff26;transition:transform .1s}
+.btn:active{transform:scale(.94)}
+.btn.pri{background:linear-gradient(#ffe07a,#e9a820);color:#2c1c00;border:0;box-shadow:0 4px 0 #9a6a08}
+.btn.warn{background:linear-gradient(#ff7b7b,#d63447);border:0;box-shadow:0 4px 0 #7d1522;animation:pulse2 .8s infinite}
+@keyframes pulse2{50%{transform:scale(1.06)}}
+.btn.red{color:#ff6b7f;font-size:24px;background:#fff}.btn.blk{color:#111;font-size:24px;background:#fff}
+.btn:disabled{opacity:.4;box-shadow:none}
+#badge{position:absolute;left:2px;top:0;z-index:45;background:#000b;border:2px solid #ffd866;border-radius:14px;padding:3px 8px 4px;text-align:center;line-height:1.1;max-width:104px}
+#badge small{display:block;font-size:11px;color:#ffd866;font-weight:700}
+#badge .bs{width:44px;height:44px;margin:2px auto;border-radius:10px;background:#fff;color:#111;font:38px/44px Georgia,serif}
+#badge .bs.red{color:#d2203a}#badge .bs.q{color:#999;font-weight:700}
+#hno{position:absolute;right:2px;top:0;z-index:45;background:#000b;border-radius:99px;padding:1px 10px;font-size:13px;font-weight:700}
+.seat.turn .nm{background:#ffd866;color:#2c1c00}
+#game.myturn #hand{filter:drop-shadow(0 0 10px #ffd86688)}
+#msg span.you{font-size:16px;padding:2px 16px;animation:pulse2 .9s infinite}
+.log{text-align:left;font:12.5px/1.4 system-ui,sans-serif;margin:8px 0;max-height:34vh;overflow-y:auto}
+.log summary{font:700 15px 'Baloo 2',sans-serif;color:#ffd866;text-align:center;cursor:pointer;padding:4px}
+.log div{padding:4px 2px;border-top:1px solid #ffffff1a}.log i{color:#ffd866;font-style:normal}
+.log.open{max-height:none}
+.card.low::after{content:'= 2';position:absolute;left:50%;top:-10px;transform:translateX(-50%);background:#ff5a5a;color:#fff;font:700 11px system-ui;padding:1px 7px;border-radius:9px;white-space:nowrap;z-index:3}
+b.dk{display:block;white-space:nowrap;font-size:11.5px}
+#meinf .mini{margin-right:12px}#meinf b.dk{display:inline;font-size:13px;margin-right:6px}
+.inf .mini{display:table;margin:3px auto 3px}
+.mini{display:inline-block;position:relative;background:#fff;color:#111;border-radius:5px;font:700 15px/1 Georgia,serif;padding:7px 5px 6px;margin:2px 6px 2px 0;vertical-align:middle;box-shadow:0 0 0 2px #ffd866,0 2px 5px #0008}
+.mini.red{color:#d2203a}
+.mini s{position:absolute;right:-9px;top:-8px;background:#ffd866;color:#2c1c00;border-radius:9px;font:700 10px system-ui;padding:1px 4px;text-decoration:none}
+/* online */
+.onl{margin:0 0 2px;background:linear-gradient(#7ee0a1,#2fae62);box-shadow:0 5px 0 #17703a;color:#04260f}
+.onl:active{box-shadow:0 2px 0 #17703a}
+input{width:100%;height:48px;border-radius:14px;border:1px solid #ffffff33;background:#0006;color:#fff;font:700 19px 'Baloo 2',sans-serif;padding:0 14px;outline:none;margin-top:4px}
+input:focus{border-color:#ffd866}
+.row{display:flex;gap:8px;align-items:center;margin-top:4px}.row input{margin:0}
+#lobby{height:100%;overflow-y:auto}
+.lwrap{padding:4px 18px 30px}
+.code{font-size:64px;font-weight:800;letter-spacing:10px;text-align:center;color:#ffd866;line-height:1.1;text-indent:10px}
+.ls{display:flex;align-items:center;gap:10px;background:#ffffff12;border-radius:14px;padding:6px 10px;margin-top:6px;font-size:17px;font-weight:700}
+.ls.bot{opacity:.55}.ls .av{width:36px;height:36px;font-size:17px;flex:none}
+.ls .tm{margin-left:auto;font-style:normal;font-size:12px;border-radius:99px;padding:0 9px}.tm.t0{background:#ffd866;color:#2c1c00}.tm.t1{background:#4dd0e1;color:#012}
+.wait{text-align:center;margin-top:18px;font-size:17px;opacity:.9}
+.chip:disabled{opacity:.3}
+#toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:#000e;border:1px solid #ffffff33;border-radius:14px;padding:8px 16px;font-size:15px;max-width:86%;text-align:center;z-index:200;opacity:0;pointer-events:none}
+#toast.go{animation:tst 3.4s both}
+@keyframes tst{8%{opacity:1}85%{opacity:1}100%{opacity:0}}
+/* modal */
+#modal,#over{position:absolute;inset:0;z-index:100;background:#000b;display:grid;place-items:end center;overflow:hidden}
+#over{place-items:center}
+.sheet{width:100%;max-height:88%;overflow-y:auto;background:#12281f;border-radius:22px 22px 0 0;padding:18px 18px 24px;position:relative;animation:up .25s;border-top:1px solid #ffffff2a}
+@keyframes up{from{transform:translateY(60%)}}
+.sheet h2{margin:0;font-size:26px;line-height:1.1}.sub{margin:2px 0 8px;opacity:.75}
+.x{position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:50%;background:#ffffff1a}
+.lab{font-size:13px;opacity:.7;margin-top:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.chip{padding:4px 16px;border-radius:99px;background:#ffffff14;font-size:16px;font-weight:700;border:1px solid #ffffff22}
+.chip.on{background:#ffd866;color:#2c1c00}
+.rules{padding-left:18px;margin:12px 0;font:14px/1.45 system-ui,sans-serif;opacity:.9}
+.rules li{margin-bottom:5px}
+.big{width:100%;height:52px;border-radius:16px;background:linear-gradient(#ffe07a,#e9a820);color:#2c1c00;font-size:21px;font-weight:800;box-shadow:0 5px 0 #9a6a08;margin-top:8px}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 #9a6a08}
+.ghost{width:100%;height:44px;background:none;font-size:16px;opacity:.8;margin-top:8px}
+.ocard{width:86%;max-width:380px;background:#12281f;border-radius:24px;padding:20px;text-align:center;border:2px solid #ffffff2a;animation:pop .35s;z-index:2}
+.ocard.win{border-color:#ffd866}
+.ocard h2{margin:0 0 6px;font-size:30px;color:#ffd866}.ocard.lose h2{color:#ff8a8a}
+.ocard p{margin:2px 0;font-size:15px;opacity:.9}
+.oemo{font-size:54px;line-height:1.1}
+.conf{position:absolute;top:-12px;width:9px;height:15px;border-radius:2px;animation:fall linear both;z-index:1}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+@media (min-height:760px){.card{width:56px;height:80px}#center.trick .tc{margin:-40px 0 0 -28px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="home">
+    <div class="logo">
+      <div class="fan"><div class="card red"><i>A<br>♥&#xFE0E;</i><b>♥&#xFE0E;</b></div><div class="card"><i>K<br>♠&#xFE0E;</i><b>♠&#xFE0E;</b></div><div class="card red"><i>2<br>♦&#xFE0E;</i><b>♦&#xFE0E;</b></div></div>
+      <h1>Pattay Baaz</h1>
+      <div class="tagline">Dosti apni jagah, patte apni jagah</div>
+    </div>
+    <button id="onl" class="big onl">👥 Doston ke saath khelo</button>
+    <div class="lab" style="text-align:center;margin:14px 0 8px">Ya bots ke saath practice</div>
+    <div id="tiles"></div>
+    <div class="foot">Pattay Baaz · asli shuffle, server par fair game</div>
+  </div>
+  <div id="game" hidden>
+    <header><button id="back">←</button><div class="hd"><div id="gname"></div><div id="status"></div></div><button id="help">?</button><button id="snd"></button></header>
+    <div id="table"><div id="felt"></div><div id="center"></div><div id="seats"></div><div id="badge" hidden></div><div id="hno" hidden></div><div id="flash"></div><div id="msg"></div></div>
+    <div id="hint"></div>
+    <div id="meinf"></div>
+    <div id="hand"></div>
+    <div id="strip"></div>
+    <div id="btns"></div>
+    <div id="over" hidden></div>
+  </div>
+  <div id="lobby" hidden></div>
+  <div id="modal" hidden></div>
+  <div id="toast"></div>
+</div>
+<script>/*ENGINE*/</script>
+<script>/*APP*/</script>
+</body>
+</html>
