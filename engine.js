@@ -82,7 +82,7 @@ const Rung = {
     let note = '';
     if (s.trickNo == s.T) { note = 'AAKHRI HATH: bachi hui ' + s.pile + ' sar ' + who + ' ko mili'; flash(s, 'Aakhri hath ' + s.names[w] + ' ne jeeta: bachi hui ' + s.pile + ' sar us ki'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
     else if (can && s.senior === w && s.trickNo >= s.minPick && we.c.r != 14) { note = who + ' ne lagatar 2 hath jeet kar ' + s.pile + ' sar uthai'; flash(s, s.names[w] + ' ne ' + s.pile + ' sar utha li!'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
-    else { const aceHold = can && s.senior === w && s.trickNo >= s.minPick; s.senior = can ? w : null; note = aceHold ? who + ' ne Ace se jeeta: Ace se sar nahi uthti, sirf senior, beech mein ' + s.pile + ' sar' : can ? who + ' senior, beech mein ' + s.pile + ' sar' : 'rung abhi band, beech mein ' + s.pile + ' sar'; }
+    else { const aceHold = can && s.senior === w && s.trickNo >= s.minPick; s.senior = can ? w : null; note = aceHold ? who + ' ne Ace phenka: Ace se sar nahi uthti, wo sirf senior rehta hai, beech mein ' + s.pile + ' sar' : can ? who + ' senior, beech mein ' + s.pile + ' sar' : 'rung abhi band, beech mein ' + s.pile + ' sar'; }
     (s.log = s.log || []).push('<b>Hath ' + s.trickNo + ':</b> ' + cards + '. Jeeta: ' + s.names[w] + '. ' + note + '. <i>Sar ' + s.sar.join(' - ') + '</i>');
     s.trickNo++;
     const mx = Math.max(...s.sar), mn = Math.min(...s.sar);
