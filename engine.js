@@ -315,7 +315,7 @@ const Bluff = {
 const pts = c => c.r == 14 ? 20 : c.r >= 11 ? 10 : 5;
 const Daketi = {
   create(o) {
-    const s = base('daketi', o); s.tableMode = 'row'; s.deck = shuffle(newDeck()); s.market = []; s.col = []; s.lock = []; s.final = null;
+    const s = base('daketi', o); s.tableMode = 'row'; s.deck = shuffle(newDeck()); s.market = s.deck.splice(0, 4); s.table = s.market.map(c => ({ c })); s.col = []; s.lock = []; s.final = null;
     for (let p = 0; p < s.n; p++) { s.hands[p] = s.deck.splice(0, 4).sort(byRank); s.col[p] = []; s.lock[p] = {}; }
     this.begin(s, rnd(s.n)); return s;
   },
