@@ -611,10 +611,21 @@ function noise(t, d, o) {
   s.connect(f); f.connect(g); g.connect(master); env(g, t, o.a || .005, o.v || .25, d); s.start(t, Math.random() * .5); s.stop(t + d + .1);
 }
 
+/* Optional real audio files: put mp3s in public/sounds/ named <sound>.mp3 (e.g. thulla.mp3) or v_<key>_<n>.mp3 for voice lines (e.g. v_thulla_1.mp3). If a file exists it replaces the built-in sound. */
+const FILES = {};
+function playFile(name) {
+  const b = FILES[name]; if (!b || !AC) return false;
+  try { const src = AC.createBufferSource(), g = AC.createGain(); src.buffer = b; g.gain.value = 1; src.connect(g); g.connect(master); src.start(); return true; } catch (e) { return false; }
+}
+let preloaded = false;
+function preload(names) {
+  if (preloaded || !AC || !root.fetch || !/^https?:$/.test((root.location || {}).protocol)) return; preloaded = true;
+  names.forEach(n => { try { fetch('sounds/' + n + '.mp3').then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => new Promise((ok, no) => AC.decodeAudioData(b, ok, no))).then(buf => { FILES[n] = buf; }).catch(() => {}); } catch (e) {} });
+}
 const S = {
   get mode() { return mode; },
   setMode(m) { mode = m; try { localStorage.setItem('pb_mode', m); } catch (e) {} if (m < 2 && root.speechSynthesis) try { speechSynthesis.cancel(); } catch (e) {} if (m) ctx(); },
-  unlock() { ctx(); },
+  unlock() { ctx(); preload(ALLNAMES()); },
   shuffle() {
     if (!on()) return; const t = AC.currentTime;
     for (let i = 0; i < 16; i++) noise(t + i * .045 + Math.random() * .02, .05, { f: 2600 + Math.random() * 2200, q: 1.5, v: .1 + Math.random() * .1 });
@@ -658,7 +669,8 @@ const S = {
   voice(key) {
     if (mode < 2 || !root.speechSynthesis) return; const L = LINES[key]; if (!L) return;
     const now = Date.now(); if (now - lastVoice < 1800 && !/hurry|late/.test(key)) return; lastVoice = now;
-    const line = L[Math.floor(Math.random() * L.length)];
+    const li = Math.floor(Math.random() * L.length), line = L[li];
+    if (playFile('v_' + key + '_' + (li + 1))) return;
     try {
       if (!voices.length) voices = speechSynthesis.getVoices();
       const pick = p => voices.find(v => v.lang && v.lang.toLowerCase().replace('_', '-').startsWith(p));
@@ -687,6 +699,10 @@ const LINES = {
   late: [{ ur: 'اب تو حد ہو گئی، جلدی کرو!', hi: 'अब तो हद हो गई, जल्दी करो!', rm: 'Ab to had ho gayi, jaldi karo!' }],
   aakhri: [{ ur: 'سب کی آخری باری!', hi: 'सब की आखिरी बारी!', rm: 'Sab ki aakhri baari!' }]
 };
+const SFXN = ['shuffle', 'slap', 'swoosh', 'pickup', 'pass', 'ding', 'lock', 'gasp', 'boing', 'thulla', 'laugh', 'evil', 'tick', 'dhol', 'cheer', 'win', 'lose'];
+function ALLNAMES() { const a = SFXN.slice(); Object.keys(LINES).forEach(k => LINES[k].forEach((_, i) => a.push('v_' + k + '_' + (i + 1)))); return a; }
+SFXN.forEach(n => { const f = S[n]; S[n] = function () { if (mode > 0 && ctx() && FILES[n]) { playFile(n); return; } return f.apply(S, arguments); }; });
+S.names = ALLNAMES; S.lines = LINES;
 if (root.speechSynthesis) try { voices = speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => { voices = speechSynthesis.getVoices(); }; } catch (e) {}
 root.SFX = S;
 })(window);

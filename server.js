@@ -32,6 +32,11 @@ function record(room) {
 const INDEX = path.join(__dirname, 'public', 'index.html');
 const server = http.createServer((req, res) => {
   if (req.url.startsWith('/lb')) { res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-cache' }); return res.end(JSON.stringify(lbTop())); }
+  if (req.url.startsWith('/sounds/')) {
+    const f = path.basename(decodeURIComponent(req.url.split('?')[0]));
+    if (!/^[\w-]+\.mp3$/.test(f)) { res.writeHead(404); return res.end(); }
+    return fs.readFile(path.join(__dirname, 'public', 'sounds', f), (e, b) => { if (e) { res.writeHead(404); return res.end(); } res.writeHead(200, { 'content-type': 'audio/mpeg', 'cache-control': 'public, max-age=3600' }); res.end(b); });
+  }
   if (req.url.startsWith('/health')) { res.writeHead(200, { 'content-type': 'text/plain' }); return res.end('ok'); }
   fs.readFile(INDEX, (e, buf) => {
     if (e) { res.writeHead(500); return res.end('index missing'); }
