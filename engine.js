@@ -81,8 +81,8 @@ const Rung = {
     const can = !s.band || s.trump != null, who = s.names[w];
     let note = '';
     if (s.trickNo == s.T) { note = 'AAKHRI HATH: bachi hui ' + s.pile + ' sar ' + who + ' ko mili'; flash(s, 'Aakhri hath ' + s.names[w] + ' ne jeeta: bachi hui ' + s.pile + ' sar us ki'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
-    else if (can && s.senior === w && s.trickNo >= s.minPick) { note = who + ' ne lagatar 2 hath jeet kar ' + s.pile + ' sar uthai'; flash(s, s.names[w] + ' ne ' + s.pile + ' sar utha li!'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
-    else { s.senior = can ? w : null; note = can ? who + ' senior, beech mein ' + s.pile + ' sar' : 'rung abhi band, beech mein ' + s.pile + ' sar'; }
+    else if (can && s.senior === w && s.trickNo >= s.minPick && we.c.r != 14) { note = who + ' ne lagatar 2 hath jeet kar ' + s.pile + ' sar uthai'; flash(s, s.names[w] + ' ne ' + s.pile + ' sar utha li!'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
+    else { const aceHold = can && s.senior === w && s.trickNo >= s.minPick; s.senior = can ? w : null; note = aceHold ? who + ' ne Ace se jeeta: Ace se sar nahi uthti, sirf senior, beech mein ' + s.pile + ' sar' : can ? who + ' senior, beech mein ' + s.pile + ' sar' : 'rung abhi band, beech mein ' + s.pile + ' sar'; }
     (s.log = s.log || []).push('<b>Hath ' + s.trickNo + ':</b> ' + cards + '. Jeeta: ' + s.names[w] + '. ' + note + '. <i>Sar ' + s.sar.join(' - ') + '</i>');
     s.trickNo++;
     const mx = Math.max(...s.sar), mn = Math.min(...s.sar);
@@ -108,7 +108,7 @@ const Rung = {
     const nonT = L.filter(c => !isT(c));
     if (!s.table.length) {
       const want = s.senior === p && s.trickNo >= s.minPick, tr = L.filter(isT);
-      if (want) { const b = hi(nonT.length ? nonT : L, ev); if (ev(b) == 14) return P(b); if (tr.length) return P(hi(tr, ev)); return P(b); }
+      if (want) { const pk = L.filter(c => c.r != 14); if (pk.length) { const t2 = pk.filter(isT); return P(hi(t2.length ? t2 : pk, ev)); } return P(hi(L, ev)); }
       const pool = nonT.length ? nonT : L, b = hi(pool, ev); return P(ev(b) >= 13 || Math.random() < .4 ? b : lo(pool, ev));
     }
     const led = s.table[0].c.s, cur = this.best(s), pw = s.n == 4 && cur.p % 2 == p % 2, last = s.table.length == s.n - 1;

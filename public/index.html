@@ -277,8 +277,8 @@ const Rung = {
     const can = !s.band || s.trump != null, who = s.names[w];
     let note = '';
     if (s.trickNo == s.T) { note = 'AAKHRI HATH: bachi hui ' + s.pile + ' sar ' + who + ' ko mili'; flash(s, 'Aakhri hath ' + s.names[w] + ' ne jeeta: bachi hui ' + s.pile + ' sar us ki'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
-    else if (can && s.senior === w && s.trickNo >= s.minPick) { note = who + ' ne lagatar 2 hath jeet kar ' + s.pile + ' sar uthai'; flash(s, s.names[w] + ' ne ' + s.pile + ' sar utha li!'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
-    else { s.senior = can ? w : null; note = can ? who + ' senior, beech mein ' + s.pile + ' sar' : 'rung abhi band, beech mein ' + s.pile + ' sar'; }
+    else if (can && s.senior === w && s.trickNo >= s.minPick && we.c.r != 14) { note = who + ' ne lagatar 2 hath jeet kar ' + s.pile + ' sar uthai'; flash(s, s.names[w] + ' ne ' + s.pile + ' sar utha li!'); s.sar[tm] += s.pile; s.pile = 0; s.senior = null; }
+    else { const aceHold = can && s.senior === w && s.trickNo >= s.minPick; s.senior = can ? w : null; note = aceHold ? who + ' ne Ace se jeeta: Ace se sar nahi uthti, sirf senior, beech mein ' + s.pile + ' sar' : can ? who + ' senior, beech mein ' + s.pile + ' sar' : 'rung abhi band, beech mein ' + s.pile + ' sar'; }
     (s.log = s.log || []).push('<b>Hath ' + s.trickNo + ':</b> ' + cards + '. Jeeta: ' + s.names[w] + '. ' + note + '. <i>Sar ' + s.sar.join(' - ') + '</i>');
     s.trickNo++;
     const mx = Math.max(...s.sar), mn = Math.min(...s.sar);
@@ -304,7 +304,7 @@ const Rung = {
     const nonT = L.filter(c => !isT(c));
     if (!s.table.length) {
       const want = s.senior === p && s.trickNo >= s.minPick, tr = L.filter(isT);
-      if (want) { const b = hi(nonT.length ? nonT : L, ev); if (ev(b) == 14) return P(b); if (tr.length) return P(hi(tr, ev)); return P(b); }
+      if (want) { const pk = L.filter(c => c.r != 14); if (pk.length) { const t2 = pk.filter(isT); return P(hi(t2.length ? t2 : pk, ev)); } return P(hi(L, ev)); }
       const pool = nonT.length ? nonT : L, b = hi(pool, ev); return P(ev(b) >= 13 || Math.random() < .4 ? b : lo(pool, ev));
     }
     const led = s.table[0].c.s, cur = this.best(s), pw = s.n == 4 && cur.p % 2 == p % 2, last = s.table.length == s.n - 1;
@@ -697,7 +697,7 @@ const $ = id => document.getElementById(id);
 const BOTS = ['Chacha', 'Bubbly', 'Pappu', 'Guddu', 'Sheeda'];
 const INFO = {
   rung: { name: 'Rung', tag: 'Court Piece, double sar', icon: '♠', col: '#f4c542', players: [4, 3], def: 4,
-    rules: ['4 player: 2 teams, partner saamne. 3 player: sab alag, ek 2 deck se nikalta hai.', 'Pehle 5 patte, phir rung chuno (ya "aakhri patta").', 'Suit follow karna zaroori. Rung sab se upar.', 'Sar beech mein jama hoti hain. Jo player 2 hath lagatar khud jeete (5wen hath se, 3 player mein 7wen se) wo saari utha leta hai.', 'Ace se jeet kar agle hath phir Ace phenko to wo 2 ginta hai (aakhri hath ke ilawa).', '7 sar = jeet (3 player mein 9). 13-0 = Kot.'] },
+    rules: ['4 player: 2 teams, partner saamne. 3 player: sab alag, ek 2 deck se nikalta hai.', 'Pehle 5 patte, phir rung chuno (ya "aakhri patta").', 'Suit follow karna zaroori. Rung sab se upar.', 'Sar beech mein jama hoti hain. Jo player 2 hath lagatar khud jeete (5wen hath se, 3 player mein 7wen se) wo saari utha leta hai.', 'Ace se jeet kar agle hath phir Ace phenko to wo 2 ginta hai (aakhri hath ke ilawa).', 'Ace se jeeti hui hath par sar nahi uthti, Ace sirf senior banata hai. Sirf aakhri (13wen/17wen) hath mein Ace se sar jati hai.', '7 sar = jeet (3 player mein 9). 13-0 = Kot.'] },
   band: { name: 'Band Rung', tag: 'Rung chupa hua', icon: '♥', col: '#ff6b6b', players: [4], def: 4,
     rules: ['Saare 13 patte baant diye jate hain, rung koi nahi.', 'Jis ke paas chalti suit na ho, wo jo patta phenke us ki suit rung ban jati hai.', 'Rung rakhne ke baad hi sar uthai ja sakti hai: senior ho kar agla hath bhi khud jeeto.', 'Baqi sab Rung jaisa: Ace rule, 7 sar jeet, 13-0 kot.'] },
   president: { name: 'President', tag: 'Haarne wala Gandu', icon: '♦', col: '#4dd0e1', players: [3, 4, 5, 6], def: 4,
